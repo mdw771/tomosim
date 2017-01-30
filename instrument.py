@@ -3,16 +3,21 @@ import numpy as np
 
 class Instrument(object):
 
-    def __init__(self, field_of_view):
-
+    def __init__(self, field_of_view, resolution):
+        """
+        :param field_of_view: width of field of view in pixel
+        :param resolution: real space resolution in um
+        :return:
+        """
         self.fov = field_of_view
+        self.resolution = resolution
         self.stage_positions = []
         self.center_positions = []
 
     def add_stage_positions(self, stage_pos):
         """
         Takes a uniaxial coordination or a list of coordinations.
-        :param stage_pos:
+        :param stage_pos: pixel positions of sample stage
         :return:
         """
 
@@ -26,7 +31,7 @@ class Instrument(object):
     def add_center_positions(self, center_pos):
         """
         Takes a coordiantion tuple or a list of tuples.
-        :param center_pos:
+        :param center_pos: pixel positions of rotation centers based on sample grid at 0 deg rotation
         :return:
         """
         if isinstance(center_pos, np.ndarray):
