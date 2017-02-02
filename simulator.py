@@ -9,6 +9,7 @@ class Simulator(object):
     def __init__(self):
 
         self.sinos_local = []
+        self.sinos_tomosaic = []
 
     def read_full_sinogram(self, fname, type='tiff', **kwargs):
 
@@ -42,10 +43,34 @@ class Simulator(object):
             mask = np.zeros(sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
             for (y, x) in np.dstack([ylist, xlist])[0]:
-                mask[y, x-dx2:x-dx2+self.inst.fov] = True
+                endl = x - dx2 if (x - dx2 >= 0) else 0
+                endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
+                mask[y, endl:endr] = True
 
             sino[mask] = self.full_sino[mask]
             local_sino = Sinogram('local', sino, (y0, x0))
             self.sinos_local.append(local_sino)
 
+    def sample_full_sinogram_tomosaic(self):
 
+        for center_pos in self.inst.stage_positions:
+
+            sino = np.zeros(self.full_sino.shape)
+            w = sino.shape[1]
+            dx2 = int(self.inst.fov / 2)
+
+            endl = center_pos - dx2 if (center_pos - dx2 >= 0) else 0
+            endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
+            sino[:, endl:endr] = self.full_sino[:, endl:endr]
+
+            partial_sino = Sinogram('tomosaic', sino, center_pos)
+            self.sinos_tomosaic.append(partial_sino)
+
+    def recon_all_local(self):
+
+        for sino in self.sinos_local:
+            sino.reconstruct()
+
+    def stitch_all_local(self):
+
+        pass
