@@ -8,4 +8,4 @@ from instrument import *
 
 
 sim = Simulator()
-sim.read_full_sinogram(os.path.join('test', 'sino_01000.tiff'))
+sim.read_raw_sinogram(os.path.join('test', 'sino_01000.tiff'))
