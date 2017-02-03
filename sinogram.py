@@ -11,8 +11,10 @@ class Sinogram(object):
         self.type = type
         self.sinogram = sinogram
         self.coords = coords
+        self.recon = None
+        self.mask = None
 
-    def reconstruct(self):
+    def reconstruct(self, fov):
 
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
@@ -23,4 +25,10 @@ class Sinogram(object):
         else:
             center = None
         rec = tomopy.recon(self.sinogram[:, np.newaxis, :], theta, center=center)
-        self.recon = np.squeeze(rec)
+        rec = np.squeeze(rec)
+
+        self.recon = rec
+        radius = fov / 2.
+        y, x = np.ogrid[0.5:0.5+rec.shape[0], 0.5:0.5+rec.shape[1]]
+        self.mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
+
