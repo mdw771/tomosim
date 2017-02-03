@@ -62,21 +62,6 @@ class Simulator(object):
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
             self.sinos_local.append(local_sino)
 
-    def sample_full_sinogram_tomosaic(self):
-
-        for center_pos in self.inst.stage_positions:
-
-            sino = np.zeros(self.raw_sino.shape)
-            w = sino.shape[1]
-            dx2 = int(self.inst.fov / 2)
-
-            endl = center_pos - dx2 if (center_pos - dx2 >= 0) else 0
-            endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
-            sino[:, endl:endr] = self.raw_sino.sinogram[:, endl:endr]
-
-            partial_sino = Sinogram(sino, 'tomosaic', coords=center_pos, center=self.raw_sino.center)
-            self.sinos_tomosaic.append(partial_sino)
-
     def recon_all_local(self):
 
         for sino in self.sinos_local:
@@ -88,6 +73,21 @@ class Simulator(object):
         for sino in self.sinos_local:
             self.full_recon_local[sino.mask] = sino.recon[sino.mask]
         return self.full_recon_local
+
+    def sample_full_sinogram_tomosaic(self):
+
+        for center_pos in self.inst.stage_positions:
+
+            sino = np.zeros(self.raw_sino.shape)
+            w = sino.shape[1]
+            dx2 = int(self.inst.fov / 2)
+
+            endl = center_pos - dx2 if (center_pos - dx2 >= 0) else 0
+            endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
+
+            partial_sino = self.raw_sino.sinogram[:, endl:endr]
+            partial_sino = Sinogram(partial_sino, 'tomosaic', coords=center_pos, center=self.raw_sino.center)
+            self.sinos_tomosaic.append(partial_sino)
 
     def stitch_all_sinos_tomosaic(self, center=None):
 

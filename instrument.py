@@ -22,7 +22,6 @@ class Instrument(object):
         :param stage_pos: pixel positions of sample stage
         :return:
         """
-
         if isinstance(stage_pos, np.ndarray):
             stage_pos = stage_pos.tolist()
         if not isinstance(stage_pos, list):

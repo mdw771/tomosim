@@ -27,8 +27,9 @@ class Sinogram(object):
             else:
                 self.center = center
         self.recon = None
-        self.mask = None
+        self.recon_mask = None
         self.shape = sinogram.shape
+
 
     def reconstruct(self, fov):
 
@@ -40,7 +41,7 @@ class Sinogram(object):
         self.recon = rec
         radius = fov / 2.
         y, x = np.ogrid[0.5:0.5+rec.shape[0], 0.5:0.5+rec.shape[1]]
-        self.mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
+        self.recon_mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """
