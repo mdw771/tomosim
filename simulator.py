@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import numpy as np
 import dxchange
 from instrument import *
@@ -54,7 +55,7 @@ class Simulator(object):
             mask = np.zeros(sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
             for (y, x) in np.dstack([ylist, xlist])[0]:
-                endl = x - dx2 if (x - dx2 >= 0) else 0
+                endl = x - dx2 if x - dx2 >= 0 else 0
                 endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
                 mask[y, endl:endr] = True
 
@@ -82,7 +83,7 @@ class Simulator(object):
             w = sino.shape[1]
             dx2 = int(self.inst.fov / 2)
 
-            endl = center_pos - dx2 if (center_pos - dx2 >= 0) else 0
+            endl = center_pos - dx2 if center_pos - dx2 >= 0 else 0
             endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
 
             partial_sino = self.raw_sino.sinogram[:, endl:endr]
@@ -91,15 +92,21 @@ class Simulator(object):
 
     def stitch_all_sinos_tomosaic(self, center=None):
 
+        if center is None:
+            center = self.raw_sino.center
         full_sino = np.zeros([1, 1])
-        for sino in self.sinos_tomosaic:
-            full_sino = arrange_image(self.stitched_sino_tomosaic, sino.sinogram, [0, sino.coords])
+        dx2 = int(self.inst.fov / 2)
+        for (i, sino) in enumerate(self.sinos_tomosaic):
+            print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i+1, len(self.sinos_tomosaic)))
+            ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
+            full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
 
         self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
 
-    def recon_all_tomosaic(self):
+    def recon_full_tomosaic(self):
 
         fov = self.stitched_sino_tomosaic.sinogram.shape[1]
+        print('Reconstructing full tomosaic sinogram.')
         self.full_recon_tomosaic = self.stitched_sino_tomosaic.reconstruct(fov)
         return self.full_recon_tomosaic
 

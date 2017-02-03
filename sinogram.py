@@ -31,11 +31,15 @@ class Sinogram(object):
         self.shape = sinogram.shape
 
 
-    def reconstruct(self, fov):
+    def reconstruct(self, fov, center=None):
 
+        if center is None:
+            center = self.center
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
-        rec = tomopy.recon(self.sinogram[:, np.newaxis, :], theta, center=self.center)
+        data = self.sinogram[:, np.newaxis, :]
+        print data.shape
+        rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
 
         self.recon = rec
