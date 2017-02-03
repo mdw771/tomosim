@@ -6,13 +6,16 @@ import tomopy
 
 class Sinogram(object):
 
-    def __init__(self, type, sinogram, coords):
+    def __init__(self, sinogram, type, coords=None):
 
-        assert type in ('local', 'tomosaic')
+        assert type in ('local', 'tomosaic', 'full')
 
         self.type = type
         self.sinogram = sinogram
-        self.coords = coords
+        if coords is None:
+            self.coords = sinogram.shape[1] / 2
+        else:
+            self.coords = coords
         self.recon = None
         self.mask = None
 
@@ -25,7 +28,7 @@ class Sinogram(object):
         elif type == 'tomosaic':
             center = self.coords
         else:
-            center = None
+            center = self.coords
         rec = tomopy.recon(self.sinogram[:, np.newaxis, :], theta, center=center)
         rec = np.squeeze(rec)
 
