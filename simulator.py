@@ -69,7 +69,7 @@ class Simulator(object):
 
         for sino in self.sinos_local:
             print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
-            sino.reconstruct()
+            sino.reconstruct(add_mask=True, fov=self.inst.fov)
 
     def stitch_all_recons_local(self):
 
