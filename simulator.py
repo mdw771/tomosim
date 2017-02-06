@@ -67,7 +67,7 @@ class Simulator(object):
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
-                dxchange.write_tiff(sino, 'sino_loc_{:d}_{:d}'.format(y0, x0), overwrite=True)
+                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True)
 
     def recon_all_local(self, save_path=None):
 
