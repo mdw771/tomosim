@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import dxchange
 import numpy as np
 import tomopy
 
@@ -30,22 +31,24 @@ class Sinogram(object):
         self.recon_mask = None
         self.shape = sinogram.shape
 
-
-    def reconstruct(self, fov, center=None):
+    def reconstruct(self, center=None, add_mask=False, fov=None):
 
         if center is None:
             center = self.center
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
         data = self.sinogram[:, np.newaxis, :]
-        print data.shape
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
-
         self.recon = rec
-        radius = fov / 2.
-        y, x = np.ogrid[0.5:0.5+rec.shape[0], 0.5:0.5+rec.shape[1]]
-        self.recon_mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
+
+        if add_mask:
+            radius = fov / 2.
+            y, x = np.ogrid[0.5:0.5+rec.shape[0], 0.5:0.5+rec.shape[1]]
+            if self.type == 'local':
+                self.recon_mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
+            else:
+                self.recon_mask = np.ones(self.recon.shape)
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """

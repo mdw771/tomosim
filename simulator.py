@@ -40,6 +40,8 @@ class Simulator(object):
 
         for center_coords in self.inst.center_positions:
 
+            print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
+
             y0, x0 = center_coords
             sino = np.zeros(self.raw_sino.shape)
             w = sino.shape[1]
@@ -54,10 +56,10 @@ class Simulator(object):
 
             mask = np.zeros(sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
-            for (y, x) in np.dstack([ylist, xlist])[0]:
-                endl = x - dx2 if x - dx2 >= 0 else 0
-                endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
-                mask[y, endl:endr] = True
+            for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
+                endl = int(x - dx2) if x - dx2 >= 0 else 0
+                endr = int(endl + self.inst.fov) if (endl + self.inst.fov <= w) else w
+                mask[int(y), endl:endr] = True
 
             sino[mask] = self.raw_sino.sinogram[mask]
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
@@ -66,6 +68,7 @@ class Simulator(object):
     def recon_all_local(self):
 
         for sino in self.sinos_local:
+            print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
             sino.reconstruct()
 
     def stitch_all_recons_local(self):
@@ -107,6 +110,7 @@ class Simulator(object):
 
         fov = self.stitched_sino_tomosaic.sinogram.shape[1]
         print('Reconstructing full tomosaic sinogram.')
-        self.full_recon_tomosaic = self.stitched_sino_tomosaic.reconstruct(fov)
+        self.stitched_sino_tomosaic.reconstruct(add_mask=True, fov=fov)
+        self.full_recon_tomosaic = self.stitched_sino_tomosaic.recon
         return self.full_recon_tomosaic
 
