@@ -31,7 +31,7 @@ if __name__ == '__main__':
     inst.add_center_positions(center_list)
 
     sim.load_instrument(inst)
-    sim.sample_full_sinogram_localtomo()
+    sim.sample_full_sinogram_localtomo(save_path='test')
     sim.recon_all_local(save_path='test')
     rec = sim.stitch_all_recons_local()
     dxchange.write_tiff(rec, 'test/recon_local')

@@ -37,7 +37,7 @@ class Simulator(object):
         assert isinstance(instrument, Instrument)
         self.inst = instrument
 
-    def sample_full_sinogram_localtomo(self):
+    def sample_full_sinogram_localtomo(self, save_path=None):
 
         for center_coords in self.inst.center_positions:
 
@@ -66,6 +66,9 @@ class Simulator(object):
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
             self.sinos_local.append(local_sino)
 
+            if save_path is not None:
+                dxchange.write_tiff(sino, 'sino_loc_{:d}_{:d}'.format(y0, x0), overwrite=True)
+
     def recon_all_local(self, save_path=None):
 
         for sino in self.sinos_local:
@@ -73,7 +76,8 @@ class Simulator(object):
             sino.reconstruct(add_mask=True, fov=self.inst.fov)
             if save_path is not None:
                 dxchange.write_tiff(sino.recon * sino.recon_mask, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
-                                                                               format(sino.coords[0], sino.coords[1])))
+                                                                               format(sino.coords[0], sino.coords[1])),
+                                    overwrite=True)
 
     def stitch_all_recons_local(self):
 
@@ -108,6 +112,7 @@ class Simulator(object):
             ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
             full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
 
+        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
         self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
 
     def recon_full_tomosaic(self):
