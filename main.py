@@ -20,10 +20,10 @@ if __name__ == '__main__':
     sim = Simulator()
     sim.read_raw_sinogram(os.path.join('test', 'sino_01000.tiff'), center=2981)
     sim.load_instrument(inst)
-    # sim.sample_full_sinogram_tomosaic()
-    # sim.stitch_all_sinos_tomosaic()
-    # rec = sim.recon_full_tomosaic()
-    # dxchange.write_tiff(rec, 'test/recon_tomosaic')
+    sim.sample_full_sinogram_tomosaic()
+    sim.stitch_all_sinos_tomosaic()
+    rec = sim.recon_full_tomosaic()
+    dxchange.write_tiff(rec, 'test/recon_tomosaic')
 
     # local acquisition
 
