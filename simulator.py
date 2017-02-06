@@ -67,7 +67,8 @@ class Simulator(object):
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
-                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True)
+                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
+                                    dtype='float32')
 
     def recon_all_local(self, save_path=None):
 
@@ -77,7 +78,7 @@ class Simulator(object):
             if save_path is not None:
                 dxchange.write_tiff(sino.recon * sino.recon_mask, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
                                                                                format(sino.coords[0], sino.coords[1])),
-                                    overwrite=True)
+                                    overwrite=True, dtype='float32')
 
     def stitch_all_recons_local(self):
 

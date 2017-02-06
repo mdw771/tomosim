@@ -23,7 +23,7 @@ if __name__ == '__main__':
     sim.sample_full_sinogram_tomosaic()
     sim.stitch_all_sinos_tomosaic()
     rec = sim.recon_full_tomosaic()
-    dxchange.write_tiff(rec, 'test/recon_tomosaic')
+    dxchange.write_tiff(rec, 'test/recon_tomosaic', dtype='float32')
 
     # local acquisition
 
@@ -34,4 +34,4 @@ if __name__ == '__main__':
     sim.sample_full_sinogram_localtomo(save_path='test/sino_loc')
     sim.recon_all_local(save_path='test/recon_loc')
     rec = sim.stitch_all_recons_local()
-    dxchange.write_tiff(rec, 'test/recon_local')
+    dxchange.write_tiff(rec, 'test/recon_local', dtype='float32')
