@@ -3,6 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import dxchange
+import os
 from instrument import *
 from sinogram import *
 from util import *
@@ -65,17 +66,20 @@ class Simulator(object):
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
             self.sinos_local.append(local_sino)
 
-    def recon_all_local(self):
+    def recon_all_local(self, save_path=None):
 
         for sino in self.sinos_local:
             print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
             sino.reconstruct(add_mask=True, fov=self.inst.fov)
+            if save_path is not None:
+                dxchange.write_tiff(sino.recon * sino.recon_mask, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
+                                                                               format(sino.coords[0], sino.coords[1])))
 
     def stitch_all_recons_local(self):
 
         self.full_recon_local = np.zeros(self.raw_sino.shape)
         for sino in self.sinos_local:
-            self.full_recon_local[sino.mask] = sino.recon[sino.mask]
+            self.full_recon_local[sino.recon_mask] = sino.recon[sino.recon_mask]
         return self.full_recon_local
 
     def sample_full_sinogram_tomosaic(self):

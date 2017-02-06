@@ -32,8 +32,6 @@ if __name__ == '__main__':
 
     sim.load_instrument(inst)
     sim.sample_full_sinogram_localtomo()
-    sim.recon_all_local()
-    for sino in sim.sinos_local:
-        dxchange.write_tiff(sino.recon * sino.recon_mask, 'test/recon_loc_{:d}_{:d}'.format(sino.coords[0], sino.coords[1]))
+    sim.recon_all_local(save_path='test')
     rec = sim.stitch_all_recons_local()
     dxchange.write_tiff(rec, 'test/recon_local')
