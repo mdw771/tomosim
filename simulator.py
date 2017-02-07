@@ -46,6 +46,8 @@ class Simulator(object):
             y0, x0 = center_coords
             nang = self.raw_sino.shape[0]
             w = self.raw_sino.shape[1]
+            fov = self.inst.fov
+            sino = np.zeros([nang, fov])
 
             # compute trajectory of center of FOV in sinogram space
             a = w - y0 - x0 - 1
@@ -56,12 +58,11 @@ class Simulator(object):
 
             mask = np.zeros(self.raw_sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
+            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (fov, fov)), 'constant', constant_values=0)
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-                endl = int(x - dx2) if x - dx2 >= 0 else 0
-                endr = int(endl + self.inst.fov) if (endl + self.inst.fov <= w) else w
-                mask[int(y), endl:endr] = True
-            sino = self.raw_sino[mask].reshape([self.inst.fov, nang])
-
+                endl = int(x - dx2 + fov)
+                endr = int(endl + fov)
+                sino[int(y), :] = raw_pad[int(y), endl:endr]
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
             self.sinos_local.append(local_sino)
 
