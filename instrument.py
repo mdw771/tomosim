@@ -11,7 +11,7 @@ class Instrument(object):
         :param resolution: real space resolution in um
         :return:
         """
-        self.fov = field_of_view
+        self.fov = int(field_of_view)
         self.resolution = resolution
         self.stage_positions = []
         self.center_positions = []

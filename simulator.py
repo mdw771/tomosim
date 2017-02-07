@@ -54,7 +54,7 @@ class Simulator(object):
             ylist = np.arange(nang, dtype='int')
             xlist = np.round(a * np.sin(b * ylist) + c)
 
-            mask = np.zeros([nang, w], dtype='bool')
+            mask = np.zeros(self.raw_sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
                 endl = int(x - dx2) if x - dx2 >= 0 else 0
