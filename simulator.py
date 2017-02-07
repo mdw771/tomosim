@@ -46,7 +46,6 @@ class Simulator(object):
             y0, x0 = center_coords
             nang = self.raw_sino.shape[0]
             w = self.raw_sino.shape[1]
-            sino = np.zeros([self.inst.fov, nang])
 
             # compute trajectory of center of FOV in sinogram space
             a = w - y0 - x0 - 1
@@ -55,14 +54,13 @@ class Simulator(object):
             ylist = np.arange(nang, dtype='int')
             xlist = np.round(a * np.sin(b * ylist) + c)
 
-            mask = np.zeros(sino.shape, dtype='bool')
+            mask = np.zeros([nang, w], dtype='bool')
             dx2 = int(self.inst.fov / 2)
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
                 endl = int(x - dx2) if x - dx2 >= 0 else 0
                 endr = int(endl + self.inst.fov) if (endl + self.inst.fov <= w) else w
                 mask[int(y), endl:endr] = True
-            for y in range(nang):
-                sino[y, :] = self.raw_sino[y, :][mask[y, :]]
+            sino = self.raw_sino[mask].reshape([self.inst.fov, nang])
 
             local_sino = Sinogram(sino, 'local', coords=(y0, x0))
             self.sinos_local.append(local_sino)
@@ -85,7 +83,11 @@ class Simulator(object):
 
         self.full_recon_local = np.zeros(self.raw_sino.shape)
         for sino in self.sinos_local:
-            self.full_recon_local[sino.recon_mask] = sino.recon[sino.recon_mask]
+            y, x = sino.coords
+            dy, dx = sino.recon.shape
+            dy2, dx2 = map(int, map(operator.div, sino.recon.shape, (2, 2)))
+            ystart, xstart = map(operator.sub, (y, x), (dy2, dx2))
+            self.full_recon_local[ystart:ystart+dy, xstart:xstart+dx][sino.recon_mask] = sino.recon[sino.recon_mask]
         return self.full_recon_local
 
     def sample_full_sinogram_tomosaic(self):

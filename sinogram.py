@@ -43,12 +43,7 @@ class Sinogram(object):
         self.recon = rec
 
         if add_mask:
-            radius = fov / 2.
-            y, x = np.ogrid[0.5:0.5+rec.shape[0], 0.5:0.5+rec.shape[1]]
-            if self.type == 'local':
-                self.recon_mask = (y - self.coords[0]) ** 2 + (x - self.coords[1]) ** 2 < radius ** 2
-            else:
-                self.recon_mask = np.ones(self.recon.shape)
+            self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], 1)
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """
