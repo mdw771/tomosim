@@ -119,8 +119,6 @@ class Simulator(object):
             print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i+1, len(self.sinos_tomosaic)))
             ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
             full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
-
-        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
         self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
 
     def recon_full_tomosaic(self, save_path=None):
