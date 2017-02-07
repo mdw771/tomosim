@@ -63,7 +63,7 @@ class Simulator(object):
                 endl = int(x - dx2 + fov)
                 endr = int(endl + fov)
                 sino[int(y), :] = raw_pad[int(y), endl:endr]
-            local_sino = Sinogram(sino, 'local', coords=(y0, x0))
+            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=int(fov/2))
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
