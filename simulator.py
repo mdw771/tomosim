@@ -78,8 +78,8 @@ class Simulator(object):
                 mask = mask[:, fov:fov+w]
                 if save_path is None:
                     save_path = 'mask'
-                dxchange.write_tiff(mask, os.path.join(save_path, 'mask_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
-                                    dtype='float32')
+                dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
+                                    overwrite=True, dtype='float32')
 
     def recon_all_local(self, save_path=None):
 
