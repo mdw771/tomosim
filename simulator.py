@@ -95,7 +95,7 @@ class Simulator(object):
             self.full_recon_local[ystart:ystart+dy, xstart:xstart+dx][sino.recon_mask] = sino.recon[sino.recon_mask]
         self.full_recon_local = self.full_recon_local[fov:fov+self.raw_sino.shape[1], fov:fov+self.raw_sino.shape[1]]
         if save_path is not None:
-            dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, 'recon_localtomo'), overwrite=True,
+            dxchange.write_tiff(self.full_recon_local, os.path.join(save_path, 'recon_localtomo'), overwrite=True,
                                 dtype='float32')
         return self.full_recon_local
 
