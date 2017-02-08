@@ -37,7 +37,7 @@ class Simulator(object):
         assert isinstance(instrument, Instrument)
         self.inst = instrument
 
-    def sample_full_sinogram_localtomo(self, save_path=None):
+    def sample_full_sinogram_localtomo(self, save_path=None, save_mask=False):
 
         for center_coords in self.inst.center_positions:
 
@@ -56,25 +56,36 @@ class Simulator(object):
             ylist = np.arange(nang, dtype='int')
             xlist = np.round(a * np.sin(b * ylist) + c)
 
-            mask = np.zeros(self.raw_sino.shape, dtype='bool')
             dx2 = int(self.inst.fov / 2)
             raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (fov, fov)), 'constant', constant_values=0)
+            if save_mask:
+                mask = np.zeros(raw_pad.shape, dtype='bool')
+            else:
+                mask = None
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
                 endl = int(x - dx2 + fov)
                 endr = int(endl + fov)
                 sino[int(y), :] = raw_pad[int(y), endl:endr]
+                if save_mask:
+                    mask[int(y), endl:endr] = True
             local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=int(fov/2))
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
                 dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
                                     dtype='float32')
+            if save_mask:
+                mask = mask[:, fov:fov+w]
+                if save_path is None:
+                    save_path = 'mask'
+                dxchange.write_tiff(mask, os.path.join(save_path, 'mask_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
+                                    dtype='float32')
 
     def recon_all_local(self, save_path=None):
 
         for sino in self.sinos_local:
             print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
-            sino.reconstruct(add_mask=True, fov=self.inst.fov)
+            sino.reconstruct(add_mask=True)
             if save_path is not None:
                 dxchange.write_tiff(sino.recon * sino.recon_mask, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
                                                                                format(sino.coords[0], sino.coords[1])),
@@ -130,7 +141,7 @@ class Simulator(object):
 
         fov = self.stitched_sino_tomosaic.sinogram.shape[1]
         print('Reconstructing full tomosaic sinogram.')
-        self.stitched_sino_tomosaic.reconstruct(add_mask=True, fov=fov)
+        self.stitched_sino_tomosaic.reconstruct(add_mask=True)
         self.full_recon_tomosaic = self.stitched_sino_tomosaic.recon
         if save_path is not None:
             dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, 'recon_tomosaic'), overwrite=True,
