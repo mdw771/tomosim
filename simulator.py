@@ -82,13 +82,18 @@ class Simulator(object):
 
     def stitch_all_recons_local(self, save_path=None):
 
-        self.full_recon_local = np.zeros(self.raw_sino.shape)
+        self.full_recon_local = np.zeros([self.raw_sino.shape[1], self.raw_sino.shape[1]])
+        fov = self.inst.fov
+        self.full_recon_local = np.pad(self.full_recon_local, fov, 'constant', constant_values=0)
         for sino in self.sinos_local:
             y, x = sino.coords
+            print('Stitching reconstructions at ({:d}, {:d}).'.format(y, x))
+            y, x = map(operator.add, (y, x), (fov, fov))
             dy, dx = sino.recon.shape
             dy2, dx2 = map(int, map(operator.div, sino.recon.shape, (2, 2)))
             ystart, xstart = map(operator.sub, (y, x), (dy2, dx2))
             self.full_recon_local[ystart:ystart+dy, xstart:xstart+dx][sino.recon_mask] = sino.recon[sino.recon_mask]
+        self.full_recon_local = self.full_recon_local[fov:fov+self.raw_sino.shape[1], fov:fov+self.raw_sino.shape[1]]
         if save_path is not None:
             dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, 'recon_localtomo'), overwrite=True,
                                 dtype='float32')
