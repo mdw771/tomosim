@@ -50,11 +50,9 @@ class Simulator(object):
             sino = np.zeros([nang, fov])
 
             # compute trajectory of center of FOV in sinogram space
-            a = w - y0 - x0 - 1
-            b = np.pi / nang
-            c = x0
             ylist = np.arange(nang, dtype='int')
-            xlist = np.round(a * np.sin(b * ylist) + c)
+            theta = (ylist.astype('float') / (nang - 1)) * np.pi
+            xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
 
             dx2 = int(self.inst.fov / 2)
             raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (fov, fov)), 'constant', constant_values=0)
