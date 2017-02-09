@@ -61,8 +61,8 @@ class Simulator(object):
             else:
                 mask = None
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-                endl = int(x - dx2 + fov)
-                endr = int(endl + fov)
+                endl = np.round(x - dx2 + fov)
+                endr = np.round(endl + fov)
                 sino[int(y), :] = raw_pad[int(y), endl:endr]
                 if save_mask:
                     mask[int(y), endl:endr] = True
