@@ -55,13 +55,14 @@ class Simulator(object):
             xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
 
             dx2 = int(self.inst.fov / 2)
-            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (fov, fov)), 'constant', constant_values=0)
+            margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
+            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=0)
             if save_mask:
                 mask = np.zeros(raw_pad.shape, dtype='bool')
             else:
                 mask = None
             for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-                endl = np.round(x - dx2 + fov)
+                endl = np.round(x - dx2 + margin)
                 endr = np.round(endl + fov)
                 sino[int(y), :] = raw_pad[int(y), endl:endr]
                 if save_mask:
@@ -73,7 +74,7 @@ class Simulator(object):
                 dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
                                     dtype='float32')
             if save_mask:
-                mask = mask[:, fov:fov+w]
+                mask = mask[:, margin:margin+w]
                 if save_path is None:
                     save_path = 'mask'
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
