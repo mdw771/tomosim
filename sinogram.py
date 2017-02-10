@@ -43,7 +43,7 @@ class Sinogram(object):
         self.recon = rec
 
         if add_mask:
-            self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], 0.9)
+            self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], 0.8)
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """
