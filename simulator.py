@@ -48,7 +48,15 @@ class Simulator(object):
             local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
             self.sinos_local.append(local_sino)
 
-    def sample_full_sinogram_localtomo(self, save_path=None, save_mask=False):
+    def sample_full_sinogram_localtomo(self, save_path=None, save_mask=False, direction='clockwise'):
+        """
+        Extract local tomography sinogram from full sinogram.
+        :param save_path:
+        :param save_mask:
+        :param direction: direction of sample rotation.
+               Available options: 'clockwise' or 'anticlockwise'
+        :return:
+        """
 
         for center_coords in self.inst.center_positions:
 
@@ -63,7 +71,12 @@ class Simulator(object):
             # compute trajectory of center of FOV in sinogram space
             ylist = np.arange(nang, dtype='int')
             theta = (ylist.astype('float') / (nang - 1)) * np.pi
-            xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
+            if direction == 'clockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
+            elif direction == 'anticlockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
+            else:
+                raise ValueError('{:s} is not a valid direction option.'.format(direction))
 
             dx2 = int(self.inst.fov / 2)
             margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
