@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import os
+import glob
 import dxchange
 from simulator import *
 from sinogram import *
@@ -30,6 +30,9 @@ if __name__ == '__main__':
     inst.add_center_positions(center_list)
 
     sim.load_instrument(inst)
-    sim.sample_full_sinogram_localtomo(save_path='test/sino_loc', save_mask=True)
+    if len(glob.glob('test/sino_loc/sino_loc*')) == 0:
+        sim.sample_full_sinogram_localtomo(save_path='test/sino_loc', save_mask=True)
+    else:
+        sim.read_sinos_local('test/sino_loc')
     sim.recon_all_local(save_path='test/recon_loc')
     sim.stitch_all_recons_local(save_path='test')

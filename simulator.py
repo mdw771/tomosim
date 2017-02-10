@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import dxchange
-import os
+import os, glob, re
 from instrument import *
 from sinogram import *
 from util import *
@@ -36,6 +36,17 @@ class Simulator(object):
 
         assert isinstance(instrument, Instrument)
         self.inst = instrument
+
+    def read_sinos_local(self, read_path=None):
+
+        print('Reading sinograms.')
+        flist = glob.glob(os.path.join(read_path, 'sino_loc*'))
+        regex = re.compile(r'.+_(\d+)_(\d+).+')
+        for fname in flist:
+            y, x = regex.search(fname).group(1, 2)
+            data = dxchange.read_tiff(fname)
+            local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
+            self.sinos_local.append(local_sino)
 
     def sample_full_sinogram_localtomo(self, save_path=None, save_mask=False):
 
