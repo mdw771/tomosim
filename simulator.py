@@ -43,7 +43,7 @@ class Simulator(object):
         flist = glob.glob(os.path.join(read_path, 'sino_loc*'))
         regex = re.compile(r'.+_(\d+)_(\d+).+')
         for fname in flist:
-            y, x = regex.search(fname).group(1, 2)
+            y, x = map(int, regex.search(fname).group(1, 2))
             data = dxchange.read_tiff(fname)
             local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
             self.sinos_local.append(local_sino)
