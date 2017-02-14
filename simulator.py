@@ -29,8 +29,8 @@ class Simulator(object):
         else:
             raw_sino = dxchange.read_tiff(fname)
         if preprocess:
-            raw_sino = tomopy.normalize_bg(raw_sino)
-            raw_sino = tomopy.minus_log(raw_sino)
+            raw_sino = tomopy.normalize_bg(raw_sino[:, np.newaxis, :])
+            raw_sino = -np.log(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center)
 
     def raw_sino_add_noise(self, fraction_mean=0.01):
