@@ -38,6 +38,7 @@ class Sinogram(object):
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
         data = self.sinogram[:, np.newaxis, :]
+        print(data.shape)
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         self.recon = rec
