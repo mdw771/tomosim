@@ -71,31 +71,34 @@ class Simulator(object):
             fov_2 = int(fov / 2)
             sino = np.zeros([nang, fov])
 
-            # # compute trajectory of center of FOV in sinogram space
-            # ylist = np.arange(nang, dtype='int')
-            # theta = (ylist.astype('float') / (nang - 1)) * np.pi
-            # if direction == 'clockwise':
-            #     xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
-            # elif direction == 'anticlockwise':
-            #     xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
-            # else:
-            #     raise ValueError('{:s} is not a valid direction option.'.format(direction))
-            #
-            # dx2 = int(self.inst.fov / 2)
-            # margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
-            # raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=0)
-            # if save_mask:
-            #     mask = np.zeros(raw_pad.shape, dtype='bool')
-            # else:
-            #     mask = None
-            # for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-            #     endl = np.round(x - dx2 + margin)
-            #     endr = np.round(endl + fov)
-            #     sino[int(y), :] = raw_pad[int(y), endl:endr]
-            #     if save_mask:
-            #         mask[int(y), endl:endr] = True
-            sino = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2, fov)
-            sino = np.squeeze(sino)
+            # compute trajectory of center of FOV in sinogram space
+            ylist = np.arange(nang, dtype='int')
+            theta = (ylist.astype('float') / (nang - 1)) * np.pi
+            if direction == 'clockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
+            elif direction == 'anticlockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
+            else:
+                raise ValueError('{:s} is not a valid direction option.'.format(direction))
+            print(w_2 - self.raw_sino.center)
+            xlist = xlist + (w_2 - self.raw_sino.center)
+
+            dx2 = int(self.inst.fov / 2)
+            margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
+            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=1)
+            if save_mask:
+                mask = np.zeros(raw_pad.shape, dtype='bool')
+            else:
+                mask = None
+            for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
+                endl = np.round(x - dx2 + margin)
+                endr = np.round(endl + fov)
+                sino[int(y), :] = raw_pad[int(y), endl:endr]
+                if save_mask:
+                    mask[int(y), endl:endr] = True
+
+            # sino = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2, fov)
+            # sino = np.squeeze(sino)
 
             local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
             self.sinos_local.append(local_sino)
