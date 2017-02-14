@@ -77,6 +77,7 @@ class Simulator(object):
                 xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
             else:
                 raise ValueError('{:s} is not a valid direction option.'.format(direction))
+            xlist = xlist + self.raw_sino.center - int(fov / 2)
 
             dx2 = int(self.inst.fov / 2)
             margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
