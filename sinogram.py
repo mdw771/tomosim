@@ -44,6 +44,8 @@ class Sinogram(object):
 
         if add_mask:
             self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], 0.8)
+        else:
+            self.recon_mask = np.ones(rec.shape, dtype='bool')
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """
