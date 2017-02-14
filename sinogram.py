@@ -31,7 +31,7 @@ class Sinogram(object):
         self.recon_mask = None
         self.shape = sinogram.shape
 
-    def reconstruct(self, center=None, add_mask=False):
+    def reconstruct(self, center=None, mask_ratio=False):
 
         if center is None:
             center = self.center
@@ -41,11 +41,7 @@ class Sinogram(object):
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         self.recon = rec
-
-        if add_mask:
-            self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], 0.8)
-        else:
-            self.recon_mask = np.ones(rec.shape, dtype='bool')
+        self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 
     def add_poisson_noise(self, fraction_mean=0.01):
         """

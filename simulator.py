@@ -90,11 +90,11 @@ class Simulator(object):
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
 
-    def recon_all_local(self, save_path=None):
+    def recon_all_local(self, save_path=None, mask_ratio=1):
 
         for sino in self.sinos_local:
             print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
-            sino.reconstruct(add_mask=True)
+            sino.reconstruct(mask_ratio=mask_ratio)
             if save_path is not None:
                 dxchange.write_tiff(sino.recon * sino.recon_mask, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
                                                                                format(sino.coords[0], sino.coords[1])),

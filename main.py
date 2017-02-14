@@ -34,5 +34,5 @@ if __name__ == '__main__':
         sim.sample_full_sinogram_localtomo(save_path='test/sino_loc', save_mask=True)
     else:
         sim.read_sinos_local('test/sino_loc')
-    sim.recon_all_local(save_path='test/recon_loc')
+    sim.recon_all_local(save_path='test/recon_loc', mask_ratio=1)
     sim.stitch_all_recons_local(save_path='test')
