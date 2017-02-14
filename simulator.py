@@ -94,7 +94,7 @@ class Simulator(object):
             #     sino[int(y), :] = raw_pad[int(y), endl:endr]
             #     if save_mask:
             #         mask[int(y), endl:endr] = True
-            sino = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, x0-w_2, w_2-y0, fov)
+            sino = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, y0-w_2, x0-w_2, fov)
             sino = np.squeeze(sino)
 
             local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
