@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import dxchange
-import os, glob, re
+import os, glob, re, warnings
 from tomopy import trim_sinogram
 from instrument import *
 from sinogram import *
@@ -64,41 +64,15 @@ class Simulator(object):
             print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
 
             y0, x0 = center_coords
-            nang = self.raw_sino.shape[0]
             w = self.raw_sino.shape[1]
             w_2 = int(w / 2)
             fov = self.inst.fov
             fov_2 = int(fov / 2)
-            sino = np.zeros([nang, fov])
 
             # compute trajectory of center of FOV in sinogram space
-            ylist = np.arange(nang, dtype='int')
-            theta = (ylist.astype('float') / (nang - 1)) * np.pi
-            if direction == 'clockwise':
-                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
-            elif direction == 'anticlockwise':
-                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
-            else:
-                raise ValueError('{:s} is not a valid direction option.'.format(direction))
-            print(w_2 - self.raw_sino.center)
-            xlist = xlist + (self.raw_sino.center - w_2)
-
-            dx2 = int(self.inst.fov / 2)
-            margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
-            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=1)
-            if save_mask:
-                mask = np.zeros(raw_pad.shape, dtype='bool')
-            else:
-                mask = None
-            for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-                endl = np.round(x - dx2 + margin)
-                endr = np.round(endl + fov)
-                sino[int(y), :] = raw_pad[int(y), endl:endr]
-                if save_mask:
-                    mask[int(y), endl:endr] = True
-
-            # sino = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2, fov)
-            # sino = np.squeeze(sino)
+            sino, mask = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2,
+                                       fov)
+            sino = np.squeeze(sino)
 
             local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
             self.sinos_local.append(local_sino)
@@ -106,12 +80,11 @@ class Simulator(object):
             if save_path is not None:
                 dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
                                     dtype='float32')
-            # if save_mask:
-            #     mask = mask[:, margin:margin+w]
-            #     if save_path is None:
-            #         save_path = 'mask'
-            #     dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
-            #                         overwrite=True, dtype='float32')
+            if save_mask:
+                if save_path is None:
+                    save_path = 'mask'
+                dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
+                                    overwrite=True, dtype='float32')
 
     def recon_all_local(self, save_path=None):
 
@@ -180,3 +153,65 @@ class Simulator(object):
                                 dtype='float32')
         return self.full_recon_tomosaic
 
+    def sample_full_sinogram_localtomo_obsolete(self, save_path=None, save_mask=False, direction='clockwise'):
+        """
+        Extract local tomography sinogram from full sinogram.
+        :param save_path:
+        :param save_mask:
+        :param direction: direction of sample rotation.
+               Available options: 'clockwise' or 'anticlockwise'
+        :return:
+        """
+
+        warnings.warn('Warning: This function has been deprecated. Use sample_full_sinogram_localtomo instead.')
+
+        for center_coords in self.inst.center_positions:
+
+            print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
+
+            y0, x0 = center_coords
+            nang = self.raw_sino.shape[0]
+            w = self.raw_sino.shape[1]
+            w_2 = int(w / 2)
+            fov = self.inst.fov
+            fov_2 = int(fov / 2)
+            sino = np.zeros([nang, fov])
+
+            # compute trajectory of center of FOV in sinogram space
+            ylist = np.arange(nang, dtype='int')
+            theta = (ylist.astype('float') / (nang - 1)) * np.pi
+            if direction == 'clockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
+            elif direction == 'anticlockwise':
+                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
+            else:
+                raise ValueError('{:s} is not a valid direction option.'.format(direction))
+            print(w_2 - self.raw_sino.center)
+            xlist = xlist + (self.raw_sino.center - w_2)
+
+            dx2 = int(self.inst.fov / 2)
+            margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
+            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=1)
+            if save_mask:
+                mask = np.zeros(raw_pad.shape, dtype='bool')
+            else:
+                mask = None
+            for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
+                endl = np.round(x - dx2 + margin)
+                endr = np.round(endl + fov)
+                sino[int(y), :] = raw_pad[int(y), endl:endr]
+                if save_mask:
+                    mask[int(y), endl:endr] = True
+
+            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
+            self.sinos_local.append(local_sino)
+
+            if save_path is not None:
+                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
+                                    dtype='float32')
+            if save_mask:
+                mask = mask[:, margin:margin+w]
+                if save_path is None:
+                    save_path = 'mask'
+                dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
+                                    overwrite=True, dtype='float32')
