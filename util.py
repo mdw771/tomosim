@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from numpy import dtype
 import gc
 import operator
 
@@ -45,7 +44,7 @@ def trim_sinogram(data, center, x, y, diameter):
         Output 3D data.
 
     """
-    data = dtype.as_float32(data.copy())
+    data = data.copy().astype('float32')
     dx, dy, dz = data.shape
     mask = np.zeros([dx, dz], dtype='bool')
 
