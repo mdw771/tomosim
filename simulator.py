@@ -81,7 +81,7 @@ class Simulator(object):
             else:
                 raise ValueError('{:s} is not a valid direction option.'.format(direction))
             print(w_2 - self.raw_sino.center)
-            xlist = xlist + (w_2 - self.raw_sino.center)
+            xlist = xlist + (self.raw_sino.center - w_2)
 
             dx2 = int(self.inst.fov / 2)
             margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
