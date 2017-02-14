@@ -4,6 +4,7 @@ from __future__ import print_function
 import numpy as np
 import dxchange
 import os, glob, re, warnings
+import tomopy
 from tomopy import trim_sinogram
 from instrument import *
 from sinogram import *
@@ -20,13 +21,16 @@ class Simulator(object):
         self.full_recon_local = None
         self.stitched_sino_tomosaic = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, **kwargs):
 
         if type == 'hdf5':
             slice = kwargs['slice']
             raw_sino = np.squeeze(dxchange.read_aps_32id(fname, sino=(slice, slice+1)))
         else:
             raw_sino = dxchange.read_tiff(fname)
+        if preprocess:
+            raw_sino = tomopy.normalize_bg(raw_sino)
+            raw_sino = tomopy.minus_log(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center)
 
     def raw_sino_add_noise(self, fraction_mean=0.01):

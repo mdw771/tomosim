@@ -18,7 +18,7 @@ if __name__ == '__main__':
     inst.add_stage_positions(stage_list)
 
     sim = Simulator()
-    sim.read_raw_sinogram(os.path.join('test', 'sino_01000.tiff'), center=2981)
+    sim.read_raw_sinogram(os.path.join('test', 'sino_raw.tiff'), center=2981)
     sim.load_instrument(inst)
     # sim.sample_full_sinogram_tomosaic()
     # sim.stitch_all_sinos_tomosaic()
