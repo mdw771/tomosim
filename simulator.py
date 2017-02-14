@@ -4,6 +4,7 @@ from __future__ import print_function
 import numpy as np
 import dxchange
 import os, glob, re
+from tomopy import trim_sinogram
 from instrument import *
 from sinogram import *
 from util import *
@@ -66,32 +67,36 @@ class Simulator(object):
             nang = self.raw_sino.shape[0]
             w = self.raw_sino.shape[1]
             fov = self.inst.fov
+            fov_2 = int(fov / 2)
             sino = np.zeros([nang, fov])
 
-            # compute trajectory of center of FOV in sinogram space
-            ylist = np.arange(nang, dtype='int')
-            theta = (ylist.astype('float') / (nang - 1)) * np.pi
-            if direction == 'clockwise':
-                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
-            elif direction == 'anticlockwise':
-                xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
-            else:
-                raise ValueError('{:s} is not a valid direction option.'.format(direction))
+            # # compute trajectory of center of FOV in sinogram space
+            # ylist = np.arange(nang, dtype='int')
+            # theta = (ylist.astype('float') / (nang - 1)) * np.pi
+            # if direction == 'clockwise':
+            #     xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) + np.sin(theta)*(w/2-y0) + w/2))
+            # elif direction == 'anticlockwise':
+            #     xlist = np.round(np.abs(np.cos(theta)*(x0-w/2) - np.sin(theta)*(w/2-y0) + w/2))
+            # else:
+            #     raise ValueError('{:s} is not a valid direction option.'.format(direction))
+            #
+            # dx2 = int(self.inst.fov / 2)
+            # margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
+            # raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=0)
+            # if save_mask:
+            #     mask = np.zeros(raw_pad.shape, dtype='bool')
+            # else:
+            #     mask = None
+            # for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
+            #     endl = np.round(x - dx2 + margin)
+            #     endr = np.round(endl + fov)
+            #     sino[int(y), :] = raw_pad[int(y), endl:endr]
+            #     if save_mask:
+            #         mask[int(y), endl:endr] = True
+            sino = trim_sinogram(self.raw_sino.sinogram, self.raw_sino.center, x0-fov_2, y0-fov_2, fov)
 
-            dx2 = int(self.inst.fov / 2)
-            margin = int(np.ceil(np.sqrt(2) / 2 * w + fov))
-            raw_pad = np.pad(np.copy(self.raw_sino.sinogram), ((0, 0), (margin, margin)), 'constant', constant_values=0)
-            if save_mask:
-                mask = np.zeros(raw_pad.shape, dtype='bool')
-            else:
-                mask = None
-            for (y, x) in np.dstack([ylist, xlist])[0].astype('int'):
-                endl = np.round(x - dx2 + margin)
-                endr = np.round(endl + fov)
-                sino[int(y), :] = raw_pad[int(y), endl:endr]
-                if save_mask:
-                    mask[int(y), endl:endr] = True
-            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=int(fov/2))
+
+            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
