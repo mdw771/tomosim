@@ -10,7 +10,7 @@ from instrument import *
 
 if __name__ == '__main__':
 
-    stage_list = [299, 749, 1209, 1666, 2123, 2580, 3038, 3495, 3951, 4409, 4866, 5317]
+    stage_list = [306, 738, 1170, 1602, 2034, 2466, 2898, 3330, 3762, 4194, 4626, 5058]
 
     # tomosaic acquisition
 
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     inst.add_stage_positions(stage_list)
 
     sim = Simulator()
-    sim.read_raw_sinogram(os.path.join('test', 'sino_raw.tiff'), center=2981)
+    sim.read_raw_sinogram(os.path.join('test', 'sino_raw.tiff'), center=2981, preprocess=True)
     sim.load_instrument(inst)
     # sim.sample_full_sinogram_tomosaic()
     # sim.stitch_all_sinos_tomosaic()
@@ -30,6 +30,7 @@ if __name__ == '__main__':
     inst.add_center_positions(center_list)
 
     sim.load_instrument(inst)
+    sim.read_sinos_local('test/sino_loc')
     if len(glob.glob('test/sino_loc/sino_loc*')) == 0:
         sim.sample_full_sinogram_localtomo(save_path='test/sino_loc', save_mask=True)
     else:
