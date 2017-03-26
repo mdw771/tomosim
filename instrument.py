@@ -5,14 +5,12 @@ import numpy as np
 
 class Instrument(object):
 
-    def __init__(self, field_of_view, resolution):
+    def __init__(self, field_of_view):
         """
-        :param field_of_view: width of field of view in pixel
-        :param resolution: real space resolution in um
+        :param field_of_view: width of field of view (px)
         :return:
         """
         self.fov = int(field_of_view)
-        self.resolution = resolution
         self.stage_positions = []
         self.center_positions = []
 

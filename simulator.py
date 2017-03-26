@@ -20,8 +20,20 @@ class Simulator(object):
         self.raw_sino = None
         self.full_recon_local = None
         self.stitched_sino_tomosaic = None
+        self.pixel_size = None
+        self.sample = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, pixel_size=1, **kwargs):
+        """
+        Read raw sinogram from file.
+        :param fname: file name
+        :param type: file format
+        :param center: rotation center
+        :param preprocess: whether or not to preprocess the sinogram to remove singularities
+        :param pixel_size: pixel size (um)
+        :param kwargs:
+        :return:
+        """
 
         if type == 'hdf5':
             slice = kwargs['slice']
@@ -32,6 +44,7 @@ class Simulator(object):
             raw_sino = tomopy.normalize_bg(raw_sino[:, np.newaxis, :])
             raw_sino = -np.log(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center)
+        self.pixel_size = pixel_size
 
     def raw_sino_add_noise(self, fraction_mean=0.01):
 
@@ -219,3 +232,14 @@ class Simulator(object):
                     save_path = 'mask'
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
+
+    def estimate_dose(self, energy, flux_rate, exposure, mode='tomosaic'):
+        """
+        Estimate radiation dose.
+        :param flux_rate: photon flux rate (ph/s/mm)
+        :param exposure: exposure time (ms)
+        :param mode: tomosaic or local
+        :return: radiation energy deposition (J/mm^2)
+        """
+        # assume spherical sample
+        t = self.raw_sino.shape[1] * self.pixel_size

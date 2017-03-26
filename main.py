@@ -14,11 +14,11 @@ if __name__ == '__main__':
 
     # tomosaic acquisition
 
-    inst = Instrument(612, 3.2)
+    inst = Instrument(612)
     inst.add_stage_positions(stage_list)
 
     sim = Simulator()
-    sim.read_raw_sinogram(os.path.join('test', 'sino_raw.tiff'), center=2981, preprocess=True)
+    sim.read_raw_sinogram(os.path.join('test', 'sino_raw.tiff'), center=2981, preprocess=True, pixel_size=3.2)
     sim.load_instrument(inst)
     # sim.sample_full_sinogram_tomosaic()
     # sim.stitch_all_sinos_tomosaic()
@@ -37,3 +37,5 @@ if __name__ == '__main__':
         sim.read_sinos_local('test/sino_loc')
     sim.recon_all_local(save_path='test/recon_loc', mask_ratio=1)
     sim.stitch_all_recons_local(save_path='test')
+
+    sim.estimate_dose(25.7, np.sqrt(1.779e13), 30, mode='tomosaic')
