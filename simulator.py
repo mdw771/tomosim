@@ -47,6 +47,7 @@ class Simulator(object):
         if preprocess:
             raw_sino = tomopy.normalize_bg(raw_sino[:, np.newaxis, :])
             raw_sino = -np.log(raw_sino)
+            raw_sino = np.squeeze(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center)
         self.pixel_size = pixel_size
 
