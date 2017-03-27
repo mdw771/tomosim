@@ -6,6 +6,7 @@ import dxchange
 import os, glob, re, warnings
 import tomopy
 from tomopy import trim_sinogram
+
 from instrument import *
 from sinogram import *
 from util import *
@@ -24,6 +25,7 @@ class Simulator(object):
         self.stitched_sino_tomosaic = None
         self.pixel_size = None
         self.sample = None
+        self.ds = None
 
     def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, pixel_size=1, **kwargs):
         """
@@ -68,7 +70,7 @@ class Simulator(object):
             local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
             self.sinos_local.append(local_sino)
 
-    def sample_full_sinogram_localtomo(self, save_path=None, save_mask=False, direction='clockwise'):
+    def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise'):
         """
         Extract local tomography sinogram from full sinogram.
         :param save_path:
@@ -115,7 +117,7 @@ class Simulator(object):
                                                                                format(sino.coords[0], sino.coords[1])),
                                     overwrite=True, dtype='float32')
 
-    def stitch_all_recons_local(self, save_path=None):
+    def stitch_all_recons_local(self, save_path=None, fname='recon_local'):
 
         self.full_recon_local = np.zeros([self.raw_sino.shape[1], self.raw_sino.shape[1]])
         fov = self.inst.fov
@@ -130,7 +132,7 @@ class Simulator(object):
             self.full_recon_local[ystart:ystart+dy, xstart:xstart+dx][sino.recon_mask] = sino.recon[sino.recon_mask]
         self.full_recon_local = self.full_recon_local[fov:fov+self.raw_sino.shape[1], fov:fov+self.raw_sino.shape[1]]
         if save_path is not None:
-            dxchange.write_tiff(self.full_recon_local, os.path.join(save_path, 'recon_localtomo'), overwrite=True,
+            dxchange.write_tiff(self.full_recon_local, os.path.join(save_path, fname), overwrite=True,
                                 dtype='float32')
         return self.full_recon_local
 
@@ -161,14 +163,14 @@ class Simulator(object):
             full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
         self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
 
-    def recon_full_tomosaic(self, save_path=None):
+    def recon_full_tomosaic(self, save_path=None, fname='recon_tomosaic'):
 
         fov = self.stitched_sino_tomosaic.sinogram.shape[1]
         print('Reconstructing full tomosaic sinogram.')
         self.stitched_sino_tomosaic.reconstruct(add_mask=True)
         self.full_recon_tomosaic = self.stitched_sino_tomosaic.recon
         if save_path is not None:
-            dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, 'recon_tomosaic'), overwrite=True,
+            dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, fname), overwrite=True,
                                 dtype='float32')
         return self.full_recon_tomosaic
 
