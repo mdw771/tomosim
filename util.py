@@ -72,6 +72,7 @@ def trim_sinogram(data, center, x, y, diameter):
         if ind2 > dz:
             ind2 = dz
 
+        int1, ind2 = map(int, [ind1, ind2])
         roidata[m, :, 0:(ind2 - ind1)] = data[m:m+1, :, ind1:ind2]
         mask[m, ind1:ind2] = True
 

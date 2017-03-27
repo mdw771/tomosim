@@ -30,7 +30,6 @@ class Project(object):
         if downsample is not None:
             for ds in downsample:
                 sim = copy.deepcopy(self.simulators[0])
-                print(sim.raw_sino.sinogram)
                 temp = tomopy.downsample(sim.raw_sino.sinogram[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
                 sim.raw_sino.sinogram = np.squeeze(temp)
                 sim.ds = ds
@@ -56,4 +55,4 @@ class Project(object):
 
             sim.sample_full_sinogram_tomosaic()
             sim.stitch_all_sinos_tomosaic()
-            sim.recon_all_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds))
+            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds))
