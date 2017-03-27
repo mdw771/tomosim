@@ -66,3 +66,14 @@ class Project(object):
 
             sim.dose_local = sim.estimate_dose(energy, sample, flux_rate, exposure, mode='local')
             sim.dose_tomosaic = sim.estimate_dose(energy, sample, flux_rate, exposure, mode='tomosaic')
+
+    def calculate_snr(self, save_path='data'):
+
+        ref_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_1x.tiff'))
+        ref_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_local_1x.tiff'))
+        for sim in self.simulators:
+            if sim.ds not in (1, None):
+                recon_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_{:d}x.tiff'.format(sim.ds)))
+                recon_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_{:d}x.tiff'.format(sim.ds)))
+                sim.snr_local = snr(recon_local, ref_local)
+                sim.snr_tomosaic = snr(recon_tomosaic, ref_tomosaic)

@@ -26,6 +26,8 @@ class Simulator(object):
         self.pixel_size = None
         self.sample = None
         self.ds = None
+        self.snr_local = None
+        self.snr_tomosaic = None
 
     def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, pixel_size=1, **kwargs):
         """

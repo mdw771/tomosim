@@ -3,6 +3,8 @@
 import numpy as np
 import glob
 import dxchange
+import matplotlib.pyplot as plt
+
 from project import *
 from simulator import *
 from sinogram import *
@@ -26,9 +28,20 @@ if __name__ == '__main__':
     prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.8)
     prj.process_all_tomosaic(save_path='data')
 
+    prj.estimate_dose(25.7, np.sqrt(1.779e13), 30)
+    prj.calculate_snr(save_path='data')
 
-
-
-
-
-    # sim.estimate_dose(25.7, np.sqrt(1.779e13), 30, mode='tomosaic')
+    dose_local = []
+    dose_tomosaic = []
+    snr_local = []
+    snr_tomosaic = []
+    for sim in prj.simulators[1:]:
+        dose_local.append(sim.dose_local)
+        dose_tomosaic.append(sim.dose_tomosaic)
+        snr_local.append(sim.snr_local)
+        snr_tomosaic.append(sim.snr_tomosaic)
+    plt.figure()
+    plt.plot(dose_local, snr_local, label='Local')
+    plt.plot(dose_tomosaic, snr_tomosaic, label='Tomosaic')
+    plt.legend()
+    plt.savefig('data/snr_vs_dose.pdf', format='pdf')
