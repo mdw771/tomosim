@@ -30,7 +30,8 @@ class Project(object):
         if downsample is not None:
             for ds in downsample:
                 sim = copy.deepcopy(self.simulators[0])
-                temp = tomopy.downsample(sim.raw_sino.sinogram[:, np.newaxis, :], level=np.log2(ds), axis=0)
+                print(sim.raw_sino.sinogram.shape)
+                temp = tomopy.downsample(sim.raw_sino.sinogram, level=np.log2(ds), axis=0)
                 sim.raw_sino.sinogram = np.squeeze(temp)
                 sim.ds = ds
                 self.simulators.append(sim)
