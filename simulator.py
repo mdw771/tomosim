@@ -9,6 +9,8 @@ from tomopy import trim_sinogram
 from instrument import *
 from sinogram import *
 from util import *
+from sample import *
+from constants import *
 
 
 class Simulator(object):
@@ -170,6 +172,51 @@ class Simulator(object):
                                 dtype='float32')
         return self.full_recon_tomosaic
 
+    def estimate_dose(self, energy, sample, flux_rate, exposure, mode='tomosaic'):
+        """
+        Estimate radiation dose.
+        :param flux_rate: photon flux rate (ph/s/mm)
+        :param exposure: exposure time (ms)
+        :param mode: "tomosaic" or "local"
+        :return: radiation energy deposition (J/mm^2)
+        """
+        assert mode in ('tomosaic', 'local') and isinstance(sample, Sample)
+        n_proj = self.raw_sino.shape[0]
+        n_fov = len(self.inst.stage_positions) if mode == 'tomosaic' else len(self.inst.center_positions)
+        fov = self.inst.fov
+        fov2 = int(fov / 2)
+        w = self.raw_sino.shape[1]
+        w2 = w / 2.
+
+        cot = lambda x: 1. / np.tan(x)
+        csc = lambda x: 1. / np.sin(x)
+
+        # assume disk sample
+        # use intersection length of the central ray as thickness
+        e_abs = 0
+        n0 = flux_rate * exposure * fov * self.pixel_size * 1e-6
+        if mode == 'tomosaic':
+            for x0 in self.inst.stage_positions:
+                t = 2 * np.sqrt(w2 ** 2 - (w2 - x0) ** 2) * self.pixel_size
+                f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
+                e_abs += (f_abs * n0 * n_proj) * energy
+                # x1 = x0 - fov2 if x0 - fov2 >= 0 else 0
+                # x2 = x1 + fov
+                # t = 2 * np.sqrt(w2 ** 2 - (w2 - np.arange(x1, x2, dtype='float')) ** 2)
+                # t = t * self.pixel_size
+                # n_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
+                # n_abs = np.sum(n_abs) / fov
+        else:
+            theta_ls = tomopy.angles(n_proj, ang1=0, ang2=180)
+            for (y0, x0) in self.inst.center_positions:
+                for theta in theta_ls:
+                    a = np.abs((cot(theta) - 1) * w2 + y0 - cot(theta) * x0) / np.abs(csc(theta))
+                    t = 2 * np.sqrt(w2 ** 2 - a ** 2) * self.pixel_size
+                    f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
+                    e_abs += (f_abs * n0) * energy
+        energy = energy * ElectronCharge * 1e3
+        return energy / (np.pi * (w2 * self.pixel_size * 1e-3) ** 2)
+
     def sample_full_sinogram_localtomo_obsolete(self, save_path=None, save_mask=False, direction='clockwise'):
         """
         Extract local tomography sinogram from full sinogram.
@@ -232,14 +279,3 @@ class Simulator(object):
                     save_path = 'mask'
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
-
-    def estimate_dose(self, energy, flux_rate, exposure, mode='tomosaic'):
-        """
-        Estimate radiation dose.
-        :param flux_rate: photon flux rate (ph/s/mm)
-        :param exposure: exposure time (ms)
-        :param mode: tomosaic or local
-        :return: radiation energy deposition (J/mm^2)
-        """
-        # assume spherical sample
-        t = self.raw_sino.shape[1] * self.pixel_size

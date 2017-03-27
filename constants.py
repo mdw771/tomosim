@@ -1,0 +1,1 @@
+ElectronCharge = 1.602e-19

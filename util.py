@@ -76,3 +76,13 @@ def trim_sinogram(data, center, x, y, diameter):
         mask[m, ind1:ind2] = True
 
     return roidata, mask
+
+
+def snr(img, ref):
+    """
+    Calculate the signal-to-noise ratio.
+    :param img: image array
+    :param ref: ground truth
+    :return:
+    """
+    return 10 * np.log10(np.linalg.norm(ref) ** 2 / np.linalg.norm(ref - img) ** 2)
