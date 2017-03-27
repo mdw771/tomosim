@@ -16,7 +16,6 @@ class Sample(object):
         :param density: density in g/cm^3
         :return:
         """
-
         self.formula = formula
         self.density = density
 

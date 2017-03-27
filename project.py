@@ -17,6 +17,8 @@ class Project(object):
 
         self.simulators = []
         self.downsample = [1]
+        self.dose_local = None
+        self.dose_tomosaic = None
 
     def add_simuators(self, fname, instrument, type='tiff', center=None, preprocess=True, pixel_size=1, downsample=None,
                       **kwargs):
@@ -57,3 +59,10 @@ class Project(object):
             sim.stitch_all_sinos_tomosaic()
             sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds),
                                     mask_ratio=mask_ratio)
+
+    def estimate_dose(self, energy, sample, flux_rate, exposure):
+
+        for sim in self.simulators:
+
+            sim.dose_local = sim.estimate_dose(energy, sample, flux_rate, exposure, mode='local')
+            sim.dose_tomosaic = sim.estimate_dose(energy, sample, flux_rate, exposure, mode='tomosaic')
