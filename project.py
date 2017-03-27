@@ -49,10 +49,11 @@ class Project(object):
             sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio)
             sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:d}x'.format(sim.ds))
 
-    def process_all_tomosaic(self, save_path='data'):
+    def process_all_tomosaic(self, save_path='data', mask_ratio=1):
 
         for sim in self.simulators:
 
             sim.sample_full_sinogram_tomosaic()
             sim.stitch_all_sinos_tomosaic()
-            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds))
+            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds),
+                                    mask_ratio=mask_ratio)

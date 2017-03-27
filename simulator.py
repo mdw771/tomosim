@@ -164,11 +164,11 @@ class Simulator(object):
             full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
         self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
 
-    def recon_full_tomosaic(self, save_path=None, fname='recon_tomosaic'):
+    def recon_full_tomosaic(self, save_path=None, fname='recon_tomosaic', mask_ratio=1):
 
         fov = self.stitched_sino_tomosaic.sinogram.shape[1]
         print('Reconstructing full tomosaic sinogram.')
-        self.stitched_sino_tomosaic.reconstruct(add_mask=True)
+        self.stitched_sino_tomosaic.reconstruct(mask_ratio=mask_ratio)
         self.full_recon_tomosaic = self.stitched_sino_tomosaic.recon
         if save_path is not None:
             dxchange.write_tiff(self.full_recon_tomosaic, os.path.join(save_path, fname), overwrite=True,

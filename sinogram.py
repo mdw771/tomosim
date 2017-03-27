@@ -31,7 +31,7 @@ class Sinogram(object):
         self.recon_mask = None
         self.shape = sinogram.shape
 
-    def reconstruct(self, center=None, mask_ratio=False):
+    def reconstruct(self, center=None, mask_ratio=1):
 
         if center is None:
             center = self.center
