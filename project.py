@@ -34,6 +34,7 @@ class Project(object):
                 sim = copy.deepcopy(self.simulators[0])
                 temp = tomopy.downsample(sim.raw_sino.sinogram[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
                 sim.raw_sino.sinogram = np.squeeze(temp)
+                sim.raw_sino.shape = sim.raw_sino.sinogram.shape
                 sim.ds = ds
                 self.simulators.append(sim)
 

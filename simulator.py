@@ -217,7 +217,10 @@ class Simulator(object):
             theta_ls = tomopy.angles(n_proj, ang1=0, ang2=180)
             for (y0, x0) in self.inst.center_positions:
                 for theta in theta_ls:
-                    a = np.abs((cot(theta) - 1) * w2 + y0 - cot(theta) * x0) / np.abs(csc(theta))
+                    if theta == 0 or np.abs(theta-np.pi/2) < 1e-6:
+                        a = np.abs(w2 - x0)
+                    else:
+                        a = np.abs((cot(theta) - 1) * w2 + y0 - cot(theta) * x0) / np.abs(csc(theta))
                     t = 2 * np.sqrt(w2 ** 2 - a ** 2) * self.pixel_size
                     f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
                     e_abs += (f_abs * n0) * energy
