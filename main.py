@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
 
-    prj.estimate_dose(25.7, np.sqrt(1.779e13), 30)
+    prj.estimate_dose(25.7, sample, np.sqrt(1.779e13), 30)
     prj.calculate_snr(save_path='data')
 
     dose_local = []
