@@ -7,6 +7,7 @@ import os
 
 import numpy as np
 import tomopy
+import matplotlib.pyplot as plt
 
 from simulator import *
 
@@ -78,3 +79,24 @@ class Project(object):
                 recon_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_{:d}x.tiff'.format(sim.ds)))
                 sim.snr_local = snr(recon_local, ref_local)
                 sim.snr_tomosaic = snr(recon_tomosaic, ref_tomosaic)
+
+    def plot_snr_vs_dose(self):
+
+        dose_local = []
+        dose_tomosaic = []
+        snr_local = []
+        snr_tomosaic = []
+        for sim in prj.simulators[1:]:
+            dose_local.append(sim.dose_local)
+            dose_tomosaic.append(sim.dose_tomosaic)
+            snr_local.append(sim.snr_local)
+            snr_tomosaic.append(sim.snr_tomosaic)
+        print('Local dose: ', dose_local, 'Local SNR: ', snr_local)
+        print('Tomosaic dose: ', dose_tomosaic, 'Tomosaic SNR: ', snr_tomosaic)
+        plt.figure()
+        plt.plot(dose_local, snr_local, label='Local')
+        plt.plot(dose_tomosaic, snr_tomosaic, label='Tomosaic')
+        plt.legend()
+        plt.xlabel('Dose (J/m$^2$)')
+        plt.ylabel('SNR')
+        plt.savefig('data/snr_vs_dose.pdf', format='pdf')

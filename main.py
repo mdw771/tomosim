@@ -34,22 +34,4 @@ if __name__ == '__main__':
     prj.estimate_dose(25.7, sample, np.sqrt(1.779e13), 30)
     prj.calculate_snr(save_path='data')
 
-    # plot SNR vs dose
-    dose_local = []
-    dose_tomosaic = []
-    snr_local = []
-    snr_tomosaic = []
-    for sim in prj.simulators[1:]:
-        dose_local.append(sim.dose_local)
-        dose_tomosaic.append(sim.dose_tomosaic)
-        snr_local.append(sim.snr_local)
-        snr_tomosaic.append(sim.snr_tomosaic)
-    print(dose_local, snr_local)
-    print(dose_tomosaic, snr_tomosaic)
-    plt.figure()
-    plt.plot(dose_local, snr_local, label='Local')
-    plt.plot(dose_tomosaic, snr_tomosaic, label='Tomosaic')
-    plt.legend()
-    plt.xlabel('Dose (J/mm$^2$)')
-    plt.ylabel('SNR')
-    plt.savefig('data/snr_vs_dose.pdf', format='pdf')
+    prj.plot_snr_vs_dose()
