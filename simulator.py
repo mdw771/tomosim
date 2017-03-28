@@ -221,9 +221,10 @@ class Simulator(object):
                         a = np.abs(w2 - x0)
                     else:
                         a = np.abs((cot(theta) - 1) * w2 + y0 - cot(theta) * x0) / np.abs(csc(theta))
-                    t = 2 * np.sqrt(w2 ** 2 - a ** 2) * self.pixel_size
-                    f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
-                    e_abs += (f_abs * n0) * energy
+                    if a < w2:
+                        t = 2 * np.sqrt(w2 ** 2 - a ** 2) * self.pixel_size
+                        f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
+                        e_abs += (f_abs * n0) * energy
         e_abs = e_abs * ElectronCharge * 1e3
         return e_abs / (np.pi * (w2 * self.pixel_size * 1e-3) ** 2)
 
