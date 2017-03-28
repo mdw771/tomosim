@@ -184,7 +184,7 @@ class Simulator(object):
         :param flux_rate: photon flux rate (ph/s/mm)
         :param exposure: exposure time (ms)
         :param mode: "tomosaic" or "local"
-        :return: radiation energy deposition (J/mm^2)
+        :return: radiation energy deposition (J/m^2)
         """
         print('Calculating dose.')
         assert mode in ('tomosaic', 'local') and isinstance(sample, Sample)
@@ -226,5 +226,5 @@ class Simulator(object):
                         f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
                         e_abs += (f_abs * n0) * energy
         e_abs = e_abs * ElectronCharge * 1e3
-        return e_abs / (np.pi * (w2 * self.pixel_size * 1e-3) ** 2)
+        return e_abs / (np.pi * (w2 * self.pixel_size * 1e-6) ** 2)
 
