@@ -224,6 +224,6 @@ class Simulator(object):
                     t = 2 * np.sqrt(w2 ** 2 - a ** 2) * self.pixel_size
                     f_abs = 1 - np.exp(-sample.get_attenuation_coeff(energy) * t)
                     e_abs += (f_abs * n0) * energy
-        energy = energy * ElectronCharge * 1e3
-        return energy / (np.pi * (w2 * self.pixel_size * 1e-3) ** 2)
+        e_abs = e_abs * ElectronCharge * 1e3
+        return e_abs / (np.pi * (w2 * self.pixel_size * 1e-3) ** 2)
 
