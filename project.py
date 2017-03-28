@@ -86,7 +86,7 @@ class Project(object):
         dose_tomosaic = []
         snr_local = []
         snr_tomosaic = []
-        for sim in prj.simulators[1:]:
+        for sim in self.simulators[1:]:
             dose_local.append(sim.dose_local)
             dose_tomosaic.append(sim.dose_tomosaic)
             snr_local.append(sim.snr_local)
@@ -94,8 +94,8 @@ class Project(object):
         print('Local dose: ', dose_local, 'Local SNR: ', snr_local)
         print('Tomosaic dose: ', dose_tomosaic, 'Tomosaic SNR: ', snr_tomosaic)
         plt.figure()
-        plt.plot(dose_local, snr_local, label='Local')
-        plt.plot(dose_tomosaic, snr_tomosaic, label='Tomosaic')
+        plt.semilogx(dose_local, snr_local, label='Local')
+        plt.semilogx(dose_tomosaic, snr_tomosaic, label='Tomosaic')
         plt.legend()
         plt.xlabel('Dose (J/m$^2$)')
         plt.ylabel('SNR')
