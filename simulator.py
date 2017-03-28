@@ -186,6 +186,7 @@ class Simulator(object):
         :param mode: "tomosaic" or "local"
         :return: radiation energy deposition (J/mm^2)
         """
+        print('Calculating dose.')
         assert mode in ('tomosaic', 'local') and isinstance(sample, Sample)
         n_proj = self.raw_sino.shape[0]
         n_fov = len(self.inst.stage_positions) if mode == 'tomosaic' else len(self.inst.center_positions)
