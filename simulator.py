@@ -6,6 +6,7 @@ import dxchange
 import os, glob, re, warnings
 import tomopy
 from tomopy import trim_sinogram
+from scipy.ndimage import imread
 
 from instrument import *
 from sinogram import *
@@ -69,7 +70,7 @@ class Simulator(object):
         regex = re.compile(r'.+_(\d+)_(\d+).+')
         for fname in flist:
             y, x = map(int, regex.search(fname).group(1, 2))
-            data = dxchange.read_tiff(fname)
+            data = imread(fname)
             local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
             self.sinos_local.append(local_sino)
 
