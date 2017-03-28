@@ -70,7 +70,7 @@ class Project(object):
     def calculate_snr(self, save_path='data'):
 
         ref_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_1x.tiff'))
-        ref_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_local_1x.tiff'))
+        ref_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_1x.tiff'))
         for sim in self.simulators:
             if sim.ds not in (1, None):
                 recon_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_{:d}x.tiff'.format(sim.ds)))
