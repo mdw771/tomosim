@@ -9,6 +9,7 @@ from project import *
 from simulator import *
 from sinogram import *
 from instrument import *
+from sample import *
 
 
 if __name__ == '__main__':
@@ -27,6 +28,8 @@ if __name__ == '__main__':
                       downsample=(2, 4, 8))
     prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.8)
     prj.process_all_tomosaic(save_path='data')
+
+    sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
 
     prj.estimate_dose(25.7, np.sqrt(1.779e13), 30)
     prj.calculate_snr(save_path='data')
