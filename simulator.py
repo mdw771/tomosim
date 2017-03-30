@@ -99,8 +99,8 @@ class Simulator(object):
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
-                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)), overwrite=True,
-                                    dtype='float32')
+                dxchange.write_tiff(local_sino.sinogram, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)),
+                                    overwrite=True, dtype='float32')
             if save_mask:
                 if save_path is None:
                     save_path = 'mask'
