@@ -60,7 +60,7 @@ def trim_sinogram(data, center, x, y, diameter):
 
         # Calculate start end coordinates for each row of the sinogram.
         ind1 = np.ceil(np.cos(alpha - m * delphi) * (l2 - l1) + l1)
-        ind2 = np.floor(np.cos(alpha - m * delphi) * (l2 - l1) + l1 + diameter)
+        ind2 = np.ceil(np.cos(alpha - m * delphi) * (l2 - l1) + l1 + diameter)
 
         # Make sure everythin is inside the frame.
         if ind1 < 0:
@@ -72,7 +72,7 @@ def trim_sinogram(data, center, x, y, diameter):
         if ind2 > dz:
             ind2 = dz
 
-        int1, ind2 = map(int, [ind1, ind2])
+        ind1, ind2 = map(int, [ind1, ind2])
         roidata[m, :, 0:(ind2 - ind1)] = data[m:m+1, :, ind1:ind2]
         mask[m, ind1:ind2] = True
 

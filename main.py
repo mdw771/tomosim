@@ -26,7 +26,7 @@ if __name__ == '__main__':
     prj = Project()
     prj.add_simuators(os.path.join('data', 'sino_raw.tiff'), inst, center=2981, preprocess=True, pixel_size=3.2,
                       downsample=(2, 4, 8))
-    prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.8)
+    prj.process_all_local(save_path='data', save_mask=True, mask_ratio=1)
     prj.process_all_tomosaic(save_path='data')
 
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)

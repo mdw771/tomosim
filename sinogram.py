@@ -7,15 +7,16 @@ import tomopy
 
 class Sinogram(object):
 
-    def __init__(self, sinogram, type, coords=None, preprocess=False, center=None):
+    def __init__(self, sinogram, type, coords=None, normalize_bg=False, minus_log=False, center=None):
 
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
         self.type = type
-        if preprocess:
+        if normalize_bg:
             sinogram = tomopy.normalize_bg(sinogram[:, np.newaxis, :])
+        if minus_log:
             sinogram = -np.log(sinogram)
-            sinogram = np.squeeze(sinogram)
+        sinogram = np.squeeze(sinogram)
         self.sinogram = sinogram
         if coords is None:
             self.coords = sinogram.shape[1] / 2
