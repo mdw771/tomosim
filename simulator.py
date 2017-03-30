@@ -30,7 +30,7 @@ class Simulator(object):
         self.snr_local = None
         self.snr_tomosaic = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, preprocess=True, pixel_size=1, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, **kwargs):
         """
         Read raw sinogram from file.
         :param fname: file name
@@ -47,11 +47,7 @@ class Simulator(object):
             raw_sino = np.squeeze(dxchange.read_aps_32id(fname, sino=(slice, slice+1)))
         else:
             raw_sino = dxchange.read_tiff(fname)
-        if preprocess:
-            raw_sino = tomopy.normalize_bg(raw_sino[:, np.newaxis, :])
-            raw_sino = -np.log(raw_sino)
-            raw_sino = np.squeeze(raw_sino)
-        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center)
+        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, preprocess=False)
         self.pixel_size = pixel_size
 
     def raw_sino_add_noise(self, fraction_mean=0.01):
@@ -99,7 +95,7 @@ class Simulator(object):
                                        fov)
             sino = np.squeeze(sino)
 
-            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2)
+            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2, preprocess=True)
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
@@ -152,7 +148,7 @@ class Simulator(object):
             endr = endl + self.inst.fov if (endl + self.inst.fov <= w) else w
 
             partial_sino = self.raw_sino.sinogram[:, endl:endr]
-            partial_sino = Sinogram(partial_sino, 'tomosaic', coords=center_pos, center=self.raw_sino.center)
+            partial_sino = Sinogram(partial_sino, 'tomosaic', coords=center_pos, preprocess=True, center=self.raw_sino.center)
             self.sinos_tomosaic.append(partial_sino)
 
     def stitch_all_sinos_tomosaic(self, center=None):

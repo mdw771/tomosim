@@ -21,11 +21,11 @@ class Project(object):
         self.dose_local = None
         self.dose_tomosaic = None
 
-    def add_simuators(self, fname, instrument, type='tiff', center=None, preprocess=True, pixel_size=1, downsample=None,
+    def add_simuators(self, fname, instrument, type='tiff', center=None, pixel_size=1, downsample=None,
                       **kwargs):
 
         sim = Simulator()
-        sim.read_raw_sinogram(fname, type=type, center=center, preprocess=preprocess, pixel_size=pixel_size, **kwargs)
+        sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, **kwargs)
         sim.load_instrument(instrument)
         sim.ds = 1
         self.simulators.append(sim)
