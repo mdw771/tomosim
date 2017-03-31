@@ -38,7 +38,7 @@ if __name__ == '__main__':
     inst.add_center_positions(center_list)
 
     prj = Project()
-    prj.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2981, preprocess=True, pixel_size=3.2,
+    prj.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, preprocess=True, pixel_size=3.2,
                       downsample=(2, 4, 8))
     prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.85)
     prj.process_all_tomosaic(save_path='data')
