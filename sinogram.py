@@ -42,13 +42,15 @@ class Sinogram(object):
 
         if center is None:
             center = self.center
+        if self.padded:
+            ind = int((self.sinogram.shape[1] - self.shape[1]) / 2)
+            center += ind
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
         data = self.sinogram[:, np.newaxis, :]
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         if self.padded:
-            ind = int((rec.shape[1] - self.shape[1]) / 2)
             rec = rec[ind:ind+self.shape[1], ind:ind+self.shape[1]]
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
