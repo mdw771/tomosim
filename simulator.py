@@ -94,6 +94,7 @@ class Simulator(object):
             sino, mask = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2,
                                        fov)
             sino = np.squeeze(sino)
+            dxchange.write_tiff(sino, 'data/temp')
 
             local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True)
             self.sinos_local.append(local_sino)

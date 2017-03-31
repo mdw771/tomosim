@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-For equal incident photon flux, compare the SNR.
-"""
 
 import numpy as np
 import glob
