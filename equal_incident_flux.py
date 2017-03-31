@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+"""
+This script works for Shepp Logan phantom.
+"""
 
 import numpy as np
 import glob
@@ -22,11 +25,16 @@ if __name__ == '__main__':
     center_list = [(y, x) for y in stage_list for x in stage_list]
     inst.add_center_positions(center_list)
 
+    n_pos_tomosaic = len(stage_list)
+    n_pos_local = len(center_list)
+
     prj = Project()
     prj.add_simuators(os.path.join('data', 'sino_raw.tiff'), inst, center=2981, preprocess=True, pixel_size=3.2,
                       downsample=(2, 4, 8))
-    prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.9)
     prj.process_all_tomosaic(save_path='data')
+
+    # prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.9)
+
 
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
 
