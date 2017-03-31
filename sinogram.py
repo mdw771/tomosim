@@ -11,15 +11,18 @@ class Sinogram(object):
 
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
+        self.padded = False
         self.type = type
+        self.shape = sinogram.shape
         if normalize_bg:
-            sinogram = tomopy.normalize_bg(sinogram[:, np.newaxis, :])
+            sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, mode='edge')
+            sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
             sinogram = -np.log(sinogram)
         sinogram = np.squeeze(sinogram)
         self.sinogram = sinogram
         if coords is None:
-            self.coords = sinogram.shape[1] / 2
+            self.coords = self.shape[1] / 2
         else:
             self.coords = coords
         if type == 'local':
@@ -29,12 +32,11 @@ class Sinogram(object):
                 self.center = center
         else:
             if center is None:
-                self.center = sinogram.shape[1] / 2
+                self.center = self.shape[1] / 2
             else:
                 self.center = center
         self.recon = None
         self.recon_mask = None
-        self.shape = sinogram.shape
 
     def reconstruct(self, center=None, mask_ratio=1):
 
@@ -45,6 +47,9 @@ class Sinogram(object):
         data = self.sinogram[:, np.newaxis, :]
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
+        if self.padded:
+            ind = int((rec.shape[1] - self.shape[1]) / 2)
+            rec = rec[ind:ind+self.shape[1], ind:ind+self.shape[1]]
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 

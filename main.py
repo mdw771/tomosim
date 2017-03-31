@@ -17,18 +17,18 @@ from sample import *
 
 if __name__ == '__main__':
 
-    stage_list = range(306, 5646, 368)
+    stage_list = range(306, 5646, 345)
     inst = Instrument(612)
     inst.add_stage_positions(stage_list)
 
-    stage_list = range(306, 5646, 368)
+    stage_list = range(306, 5646, 345)
     center_list = [(y, x) for y in stage_list for x in stage_list]
     inst.add_center_positions(center_list)
 
     prj = Project()
     prj.add_simuators(os.path.join('data', 'sino_raw.tiff'), inst, center=2981, preprocess=True, pixel_size=3.2,
                       downsample=(2, 4, 8))
-    prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.9)
+    prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.85)
     prj.process_all_tomosaic(save_path='data')
 
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
