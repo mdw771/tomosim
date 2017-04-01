@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import tomopy
+from scipy.ndimage import zoom
+
 import gc
 import operator
 
@@ -87,3 +90,14 @@ def snr(img, ref):
     :return:
     """
     return 10 * np.log10(np.linalg.norm(ref) ** 2 / np.linalg.norm(ref - img) ** 2)
+
+
+def downsample_img(img, ds, axis=0):
+
+    if isinstance(ds, int):
+        res = tomopy.downsample(img[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
+    else:
+        zm = np.ones(img.ndim)
+        zm[axis] = 1. / ds
+        res = zoom(img, zm)
+    return res

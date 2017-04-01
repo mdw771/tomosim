@@ -10,6 +10,7 @@ import tomopy
 import matplotlib.pyplot as plt
 
 from simulator import *
+from util import *
 
 
 class Project(object):
@@ -33,25 +34,26 @@ class Project(object):
         if downsample is not None:
             for ds in downsample:
                 sim = copy.deepcopy(self.simulators[0])
-                temp = tomopy.downsample(sim.raw_sino.sinogram[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
+                temp = downsample_img(sim.raw_sino.sinogram[:, np.newaxis, :], ds, axis=0)
                 sim.raw_sino.sinogram = np.squeeze(temp)
                 sim.raw_sino.shape = sim.raw_sino.sinogram.shape
                 sim.ds = ds
+                sim.name_ds = '{:d}'.format(sim.ds) if isinstance(sim.ds, int) else '{:.2f}'.format(sim.ds)
                 self.simulators.append(sim)
 
     def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1):
 
         for sim in self.simulators:
 
-            sino_path = os.path.join(save_path, 'sino_loc_{:d}x'.format(sim.ds))
+            sino_path = os.path.join(save_path, 'sino_loc_{:s}x'.format(sim.name_ds))
             if len(glob.glob(os.path.join(sino_path, 'sino_loc*'))) == 0:
                 sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask)
             else:
                 sim.read_sinos_local(sino_path)
 
-            recon_path = os.path.join(save_path, 'recon_loc_{:d}x'.format(sim.ds))
+            recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
             sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio)
-            sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:d}x'.format(sim.ds))
+            sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
 
     def process_all_tomosaic(self, save_path='data', mask_ratio=1):
 
@@ -59,7 +61,7 @@ class Project(object):
 
             sim.sample_full_sinogram_tomosaic()
             sim.stitch_all_sinos_tomosaic()
-            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:d}x'.format(sim.ds),
+            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:s}x'.format(sim.name_ds),
                                     mask_ratio=mask_ratio)
 
     def estimate_dose(self, energy, sample, flux_rate, exposure):
@@ -75,8 +77,8 @@ class Project(object):
         ref_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_1x.tiff'))
         for sim in self.simulators:
             if sim.ds not in (1, None):
-                recon_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_{:d}x.tiff'.format(sim.ds)))
-                recon_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_{:d}x.tiff'.format(sim.ds)))
+                recon_local = dxchange.read_tiff(os.path.join(save_path, 'recon_local_{:s}x.tiff'.format(sim.name_ds)))
+                recon_tomosaic = dxchange.read_tiff(os.path.join(save_path, 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
                 sim.snr_local = snr(recon_local, ref_local)
                 sim.snr_tomosaic = snr(recon_tomosaic, ref_tomosaic)
 

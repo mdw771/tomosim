@@ -27,6 +27,7 @@ class Simulator(object):
         self.pixel_size = None
         self.sample = None
         self.ds = None
+        self.name_ds = None
         self.snr_local = None
         self.snr_tomosaic = None
 

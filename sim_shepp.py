@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # dxchange.write_tiff(np.squeeze(sino), 'data/shepp_sino', overwrite=True)
 
     stage_list = range(256, 4096, 306)
-    inst = Instrument(612)
+    inst = Instrument(512)
     inst.add_stage_positions(stage_list)
 
     stage_list = range(256, 4096, 306)
