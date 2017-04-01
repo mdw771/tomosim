@@ -95,7 +95,10 @@ def snr(img, ref):
 def downsample_img(img, ds, axis=0):
 
     if isinstance(ds, int):
-        res = tomopy.downsample(img[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
+        if img.ndim == 3:
+            res = tomopy.downsample(img, level=int(np.log2(ds)), axis=0)
+        else:
+            res = tomopy.downsample(img[:, np.newaxis, :], level=int(np.log2(ds)), axis=0)
     else:
         zm = np.ones(img.ndim)
         zm[axis] = 1. / ds
