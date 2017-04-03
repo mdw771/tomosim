@@ -33,9 +33,10 @@ if __name__ == '__main__':
                                downsample=(2, 4, 8))
     ds_local = []
     n_proj_full = prj_tomosaic.simulators[0].raw_sino.shape[0]
-    for sim in prj_tomosaic.simulators[1:]:
+    for sim in prj_tomosaic.simulators:
         n_proj_local = int(float(prj_tomosaic.simulators[0].raw_sino.shape[0]) * n_pos_tomosaic / n_pos_local)
         ds_local.append(float(n_proj_full) / float(n_proj_local))
+    print ds_local
 
     prj_local = Project()
     prj_tomosaic.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
