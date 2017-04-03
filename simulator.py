@@ -68,7 +68,8 @@ class Simulator(object):
         for fname in flist:
             y, x = map(int, regex.search(fname).group(1, 2))
             data = imread(fname)
-            local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2))
+            local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2), normalize_bg=True,
+                                  minus_log=True)
             self.sinos_local.append(local_sino)
 
     def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise'):
@@ -97,11 +98,11 @@ class Simulator(object):
             sino = np.squeeze(sino)
             # dxchange.write_tiff(sino, 'data/temp')
 
-            local_sino = Sinogram(sino, 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True)
+            local_sino = Sinogram(np.copy(sino), 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True)
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
-                dxchange.write_tiff(local_sino.sinogram, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)),
+                dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
             if save_mask:
                 if save_path is None:

@@ -13,7 +13,7 @@ class Sinogram(object):
 
         self.padded = False
         self.type = type
-        self.shape = sinogram.shape
+        self.shape = sinogram.shape # unpadded shape
         if normalize_bg:
             self.padded = True
             sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, mode='edge')

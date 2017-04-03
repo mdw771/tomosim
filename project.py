@@ -29,6 +29,7 @@ class Project(object):
         sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, **kwargs)
         sim.load_instrument(instrument)
         sim.ds = 1
+        sim.name_ds = '{:d}'.format(sim.ds) if isinstance(sim.ds, int) else '{:.2f}'.format(sim.ds)
         self.simulators.append(sim)
 
         if downsample is not None:
@@ -39,6 +40,7 @@ class Project(object):
                 sim.raw_sino.shape = sim.raw_sino.sinogram.shape
                 sim.ds = ds
                 sim.name_ds = '{:d}'.format(sim.ds) if isinstance(sim.ds, int) else '{:.2f}'.format(sim.ds)
+                print(sim.name_ds)
                 self.simulators.append(sim)
 
     def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1):
