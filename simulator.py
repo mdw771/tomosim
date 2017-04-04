@@ -228,3 +228,24 @@ class Simulator(object):
         e_abs = e_abs * ElectronCharge * 1e3
         return e_abs / (np.pi * (w2 * self.pixel_size * 1e-6) ** 2)
 
+    def estimate_dose_rough(self, energy, sample, flux_rate, exposure, mode='tomosaic'):
+        """
+        Estimate radiation dose.
+        :param flux_rate: photon flux rate (ph/s/mm)
+        :param exposure: exposure time (ms)
+        :param mode: "tomosaic" or "local"
+        :return: radiation energy deposition (J/m^2)
+        """
+        print('Calculating dose.')
+        assert mode in ('tomosaic', 'local') and isinstance(sample, Sample)
+        n_proj = self.raw_sino.shape[0]
+        n_fov = len(self.inst.stage_positions) if mode == 'tomosaic' else len(self.inst.center_positions)
+        fov = self.inst.fov
+        w = self.raw_sino.shape[1]
+        w2 = w / 2.
+
+        # total incident flux
+        influx = flux_rate * exposure * fov * self.pixel_size * n_proj * n_fov * 1e-6
+        e_dep = (1 - np.exp(-sample.get_attenuation_coeff(energy) * w)) * energy * ElectronCharge * influx
+
+        return influx, e_dep / (np.pi * (w2 * self.pixel_size * 1e-6) ** 2)

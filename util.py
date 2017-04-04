@@ -82,14 +82,18 @@ def trim_sinogram(data, center, x, y, diameter):
     return roidata, mask
 
 
-def snr(img, ref):
+def snr(img, ref, mask_ratio=None):
     """
     Calculate the signal-to-noise ratio.
     :param img: image array
     :param ref: ground truth
     :return:
     """
-    return 10 * np.log10(np.linalg.norm(ref) ** 2 / np.linalg.norm(ref - img) ** 2)
+    if mask_ratio is None:
+        return 10 * np.log10(np.linalg.norm(ref) ** 2 / np.linalg.norm(ref - img) ** 2)
+    else:
+        mask = tomopy.misc.corr._get_mask(img.shape[0], img.shape[1], mask_ratio)
+        return 10 * np.log10(np.linalg.norm(ref[mask]) ** 2 / np.linalg.norm(ref[mask] - img[mask]) ** 2)
 
 
 def downsample_img(img, ds, axis=0):
@@ -104,3 +108,7 @@ def downsample_img(img, ds, axis=0):
         zm[axis] = 1. / ds
         res = zoom(img, zm)
     return res
+
+
+
+
