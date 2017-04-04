@@ -66,7 +66,7 @@ if __name__ == '__main__':
         influx.append(sim.estimate_dose_rough(25.7, sample, np.sqrt(1.779e13), 30, mode='tomosaic')[0])
         img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x'.format(sim.name_ds)))
         snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.95))
-    for sim in prj_local.simulators:
+    for sim in prj_local.simulators[1:]:
         img = dxchange.read_tiff(os.path.join('data', 'recon_local_{:s}x'.format(sim.name_ds)))
         snr_local.append(snr(img, ref_recon, mask_ratio=0.95))
     plt.figure()
