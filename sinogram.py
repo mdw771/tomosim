@@ -16,7 +16,7 @@ class Sinogram(object):
         self.shape = sinogram.shape # unpadded shape
         if normalize_bg:
             self.padded = True
-            sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, npad=np.ceil(sinogram.shape[1]/2), mode='edge')
+            sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, npad=int(np.ceil(sinogram.shape[1]/2)), mode='edge')
             sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
             sinogram = -np.log(sinogram)
