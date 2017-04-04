@@ -44,7 +44,7 @@ if __name__ == '__main__':
     prj_local.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
                                downsample=ds_local)
 
-    if True:
+    if False:
         prj_tomosaic.process_all_tomosaic()
         prj_local.process_all_local(mask_ratio=0.85)
 
@@ -53,11 +53,12 @@ if __name__ == '__main__':
         ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
     else:
         sino = dxchange.read_tiff('data/shepp_sino_trans.tiff')
+        sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
         theta = tomopy.angles(sino.shape[0])
         ref_recon = tomopy.recon(sino, theta, center=2048, algorithm='gridrec')
         dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
-        ref_recon = np.squeeze(ref_recon)
+    ref_recon = np.squeeze(ref_recon)
 
     influx = []
     snr_tomosaic = []
@@ -65,16 +66,15 @@ if __name__ == '__main__':
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
     for sim in prj_tomosaic.simulators:
         influx.append(sim.estimate_dose_rough(25.7, sample, np.sqrt(1.779e13), 30, mode='tomosaic')[0])
-        img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x'.format(sim.name_ds)))
+        img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
         snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.95))
     for sim in prj_local.simulators[1:]:
-        img = dxchange.read_tiff(os.path.join('data', 'recon_local_{:s}x'.format(sim.name_ds)))
+        img = dxchange.read_tiff(os.path.join('data', 'recon_local_{:s}x.tiff'.format(sim.name_ds)))
         snr_local.append(snr(img, ref_recon, mask_ratio=0.95))
     plt.figure()
-    plt.semilogx(influx, snr_local, label='Local')
-    plt.semilogx(influx, snr_tomosaic, label='Tomosaic')
+    plt.semilogx(influx, snr_local, label='Local', marker='o')
+    plt.semilogx(influx, snr_tomosaic, label='Tomosaic', marker='o')
     plt.legend()
     plt.xlabel('Total influx')
     plt.ylabel('SNR')
     plt.savefig('data/snr_vs_influx.pdf', format='pdf')
-

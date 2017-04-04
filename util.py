@@ -108,7 +108,3 @@ def downsample_img(img, ds, axis=0):
         zm[axis] = 1. / ds
         res = zoom(img, zm)
     return res
-
-
-
-
