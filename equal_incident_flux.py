@@ -17,11 +17,11 @@ from sample import *
 
 if __name__ == '__main__':
 
-    stage_list = range(306, 5646, 368)
+    stage_list = range(256, 4096, 306)
     inst = Instrument(512)
     inst.add_stage_positions(stage_list)
 
-    stage_list = range(306, 5646, 368)
+    stage_list = range(256, 4096, 306)
     center_list = [(y, x) for y in stage_list for x in stage_list]
     inst.add_center_positions(center_list)
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     n_proj_full = prj_tomosaic.simulators[0].raw_sino.shape[0]
     for sim in prj_tomosaic.simulators:
         print(sim.raw_sino.shape[0], n_pos_tomosaic, n_pos_local)
-        n_proj_local = int(sim.raw_sino.shape[0] * n_pos_tomosaic / float(n_pos_local))
+        n_proj_local = sim.raw_sino.shape[0] * n_pos_tomosaic / float(n_pos_local)
         ds_local.append(float(n_proj_full) / float(n_proj_local))
     print ds_local
 

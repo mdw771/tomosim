@@ -128,7 +128,7 @@ class Simulator(object):
         for sino in self.sinos_local:
             y, x = sino.coords
             print('Stitching reconstructions at ({:d}, {:d}).'.format(y, x))
-            y, x = map(operator.add, (y, x), (fov, fov))
+            # y, x = map(operator.add, (y, x), (fov, fov))
             dy, dx = sino.recon.shape
             dy2, dx2 = map(int, map(operator.div, sino.recon.shape, (2, 2)))
             ystart, xstart = map(operator.sub, (y, x), (dy2, dx2))
