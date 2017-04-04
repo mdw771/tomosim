@@ -44,8 +44,9 @@ if __name__ == '__main__':
     prj_local.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
                                downsample=ds_local)
 
-    prj_tomosaic.process_all_tomosaic()
-    prj_local.process_all_local(mask_ratio=0.85)
+    if True:
+        prj_tomosaic.process_all_tomosaic()
+        prj_local.process_all_local(mask_ratio=0.85)
 
     # create reference recon
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
@@ -77,12 +78,3 @@ if __name__ == '__main__':
     plt.ylabel('SNR')
     plt.savefig('data/snr_vs_influx.pdf', format='pdf')
 
-    # prj.process_all_local(save_path='data', save_mask=True, mask_ratio=0.9)
-
-    #
-    # sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
-    #
-    # prj.estimate_dose(25.7, sample, np.sqrt(1.779e13), 30)
-    # prj.calculate_snr(save_path='data')
-    #
-    # prj.plot_snr_vs_dose()
