@@ -94,13 +94,19 @@ def snr(img, ref, mask_ratio=None):
     :param ref: ground truth
     :return:
     """
+    r = np.copy(ref)
+    i = np.copy(img)
     if mask_ratio is None:
-        r = normalize(ref)
-        i = normalize(img)
+        rmean = r.mean()
+        imean = i.mean()
+        r = r + imean - rmean
     else:
         mask = tomopy.misc.corr._get_mask(img.shape[0], img.shape[1], mask_ratio)
-        r = normalize(ref[mask])
-        i = normalize(img[mask])
+        r = r[mask]
+        i = i[mask]
+        rmean = r.mean()
+        imean = i.mean()
+        r = r + imean - rmean
     return 10 * np.log10(np.linalg.norm(r) ** 2 / np.linalg.norm(r - i) ** 2)
 
 
