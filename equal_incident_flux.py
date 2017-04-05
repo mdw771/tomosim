@@ -64,7 +64,7 @@ if __name__ == '__main__':
     snr_tomosaic = []
     snr_local = []
     sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
-    for sim in prj_tomosaic.simulators:
+    for sim in prj_tomosaic.simulators[1:]:
         influx.append(sim.estimate_dose_rough(25.7, sample, np.sqrt(1.779e13), 30, mode='tomosaic')[0])
         img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
         snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.8))
