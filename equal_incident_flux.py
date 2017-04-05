@@ -44,7 +44,7 @@ if __name__ == '__main__':
     prj_local.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
                                downsample=ds_local)
 
-    if False:
+    if True:
         prj_tomosaic.process_all_tomosaic()
         prj_local.process_all_local(mask_ratio=0.85)
 
