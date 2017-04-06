@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     prj_tomosaic = Project()
     prj_tomosaic.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
-                               downsample=(2, 4, 8, 16, 32, 64, 128, 256))
+                               downsample=(2, 4, 8, 16, 32))
     ds_local = []
     n_proj_full = prj_tomosaic.simulators[0].raw_sino.shape[0]
     for sim in prj_tomosaic.simulators:
