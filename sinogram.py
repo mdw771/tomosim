@@ -12,10 +12,13 @@ class Sinogram(object):
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
         self.padded = False
+        self.normalized_bg = False
         self.type = type
         self.shape = sinogram.shape # unpadded shape
         if normalize_bg:
+            self.scaler = (np.mean(sinogram[:, 0]) + np.mean(sinogram[:, -1])) / 2
             self.padded = True
+            self.normalized_bg = True
             sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, npad=int(np.ceil(sinogram.shape[1]*1.5)), mode='edge')
             sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
@@ -53,6 +56,8 @@ class Sinogram(object):
         rec = np.squeeze(rec)
         if self.padded:
             rec = rec[ind:ind+self.shape[1], ind:ind+self.shape[1]]
+        if self.normalized_bg:
+            rec = rec * self.scaler
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 
@@ -61,7 +66,6 @@ class Sinogram(object):
         Add poisson noise to the sinogram.
         :param fraction_mean: float; poisson expectation as fraction of sinogram mean value
         """
-
         lam = self.sinogram.mean() * fraction_mean
         noise = np.random.poisson(lam=lam, size=self.sinogram.shape) - lam
         self.sinogram = self.sinogram + noise
