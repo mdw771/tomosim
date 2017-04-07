@@ -2,7 +2,7 @@
 
 import numpy as np
 import tomopy
-from scipy.ndimage import zoom
+from scipy.ndimage import zoom, gaussian_filter
 
 import gc
 import operator
@@ -124,11 +124,13 @@ def downsample_img(img, ds, axis=0):
     return res
 
 
-def lateral_damp(img, length=50):
+def lateral_damp(img, length=50, sigma=None):
 
-    scaler = np.linspace(0, 1, length)
-    res = np.copy(img)
-    for i in range(res.shape[0]):
-        res[i, :length] = res[i, :length] * scaler
-        res[i, -length:] = res[i, -length:] * scaler[::-1]
-    return res
+    ind = int(length / 2)
+    mask = np.ones(img.shape)
+    mask[:, :ind] = 0
+    mask[:, -ind:] = 0
+    if sigma is None:
+        sigma = ind / 5.
+    mask = gaussian_filter(mask, sigma=sigma)
+    return img * mask
