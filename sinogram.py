@@ -55,7 +55,7 @@ class Sinogram(object):
         theta = tomopy.angles(nang)
 
         ###
-        dxchange.write_tiff(self.sinogram, 'data/test')
+        dxchange.write_tiff(self.sinogram, 'data/test/test', dtype='float32')
         ###
 
         data = self.sinogram[:, np.newaxis, :]

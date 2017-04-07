@@ -128,6 +128,7 @@ def lateral_damp(img, length=50):
 
     scaler = np.linspace(0, 1, length)
     res = np.copy(img)
-    res[:, :length] = res[:length] * scaler
-    res[:, -length:] = res[:, -length:] * scaler[::-1]
+    for i in range(res.shape[0]):
+        res[i, :length] = res[i, :length] * scaler
+        res[i, -length:] = res[i, -length:] * scaler[::-1]
     return res
