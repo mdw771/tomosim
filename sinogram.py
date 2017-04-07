@@ -3,6 +3,7 @@
 import dxchange
 import numpy as np
 import tomopy
+from util import *
 
 
 class Sinogram(object):
@@ -12,15 +13,16 @@ class Sinogram(object):
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
         self.padded = False
-        self.normalized_bg = False
+        # self.normalized_bg = False
         self.type = type
         self.shape = sinogram.shape # unpadded shape
         if normalize_bg:
             self.scaler = (np.mean(sinogram[:, 0]) + np.mean(sinogram[:, -1])) / 2
             self.padded = True
-            self.normalized_bg = True
+            # self.normalized_bg = True
             sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, npad=int(np.ceil(sinogram.shape[1]*1.5)), mode='edge')
-            sinogram = tomopy.normalize_bg(sinogram)
+            sinogram = lateral_damp(np.squeeze(sinogram), length=int(0.3*self.shape[1]))
+            # sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
             sinogram = -np.log(sinogram)
         sinogram = np.squeeze(sinogram)
@@ -51,13 +53,18 @@ class Sinogram(object):
             center += ind
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang)
+
+        ###
+        dxchange.write_tiff(self.sinogram, 'data/test')
+        ###
+
         data = self.sinogram[:, np.newaxis, :]
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         if self.padded:
             rec = rec[ind:ind+self.shape[1], ind:ind+self.shape[1]]
-        if self.normalized_bg:
-            rec = rec * self.scaler
+        # if self.normalized_bg:
+            # rec = rec * self.scaler
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 

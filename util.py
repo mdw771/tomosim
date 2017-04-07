@@ -122,3 +122,12 @@ def downsample_img(img, ds, axis=0):
         zm[axis] = 1. / ds
         res = zoom(img, zm)
     return res
+
+
+def lateral_damp(img, length=50):
+
+    scaler = np.linspace(0, 1, length)
+    res = np.copy(img)
+    res[:, :length] = res[:length] * scaler
+    res[:, -length:] = res[:, -length:] * scaler[::-1]
+    return res
