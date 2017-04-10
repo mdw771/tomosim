@@ -45,7 +45,7 @@ if __name__ == '__main__':
                                downsample=ds_local)
 
     if True:
-        prj_tomosaic.process_all_tomosaic()
+        # prj_tomosaic.process_all_tomosaic()
         prj_local.process_all_local(mask_ratio=0.85)
 
     # create reference recon
