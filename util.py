@@ -140,8 +140,8 @@ def pad_sinogram(sino, length):
     length = int(length)
     res = np.zeros([sino.shape[0], sino.shape[1] + length * 2])
     res[:, length:length+sino.shape[1]] = sino
-    mean_left = np.mean(sino[:, :40], axis=1)
-    mean_right = np.mean(sino[:, -40:], axis=1)
+    mean_left = np.mean(sino[:, :40], axis=1).reshape([sino.shape[0], 1])
+    mean_right = np.mean(sino[:, -40:], axis=1).reshape([sino.shape[0], 1])
     res[:, :length] = mean_left
     res[:, -length:] = mean_right
 
