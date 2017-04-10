@@ -20,13 +20,13 @@ class Sinogram(object):
             self.scaler = (np.mean(sinogram[:, 0]) + np.mean(sinogram[:, -1])) / 2
             self.padded = True
             # self.normalized_bg = True
-            sinogram = tomopy.pad(sinogram[:, np.newaxis, :], 2, npad=int(np.ceil(sinogram.shape[1]*1.5)), mode='edge')
+            sinogram = pad_sinogram(sinogram, int(np.ceil(sinogram.shape[1]*2)))
             # sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
             sinogram = -np.log(sinogram)
         sinogram = np.squeeze(sinogram)
-        if self.padded:
-            sinogram = lateral_damp(sinogram, length=int(0.3*self.shape[1]))
+        # if self.padded:
+        #     sinogram = lateral_damp(sinogram, length=int(0.3*self.shape[1]))
         self.sinogram = sinogram
         if coords is None:
             self.coords = self.shape[1] / 2
