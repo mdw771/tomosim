@@ -18,6 +18,18 @@ from sample import *
 
 if __name__ == '__main__':
 
+    # create reference recon
+    if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
+        ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
+    else:
+        sino = dxchange.read_tiff('data/shepp_sino_trans.tiff')
+        sino = -np.log(sino)
+        sino = sino[:, np.newaxis, :]
+        theta = tomopy.angles(sino.shape[0])
+        ref_recon = tomopy.recon(sino, theta, center=2048, algorithm='gridrec')
+        dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
+    ref_recon = np.squeeze(ref_recon)
+
     stage_list = range(256, 4096, 306)
     inst = Instrument(512)
     inst.add_stage_positions(stage_list)
@@ -46,19 +58,7 @@ if __name__ == '__main__':
 
     if True:
         # prj_tomosaic.process_all_tomosaic()
-        prj_local.process_all_local(mask_ratio=0.85)
-
-    # create reference recon
-    if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
-        ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
-    else:
-        sino = dxchange.read_tiff('data/shepp_sino_trans.tiff')
-        sino = -np.log(sino)
-        sino = sino[:, np.newaxis, :]
-        theta = tomopy.angles(sino.shape[0])
-        ref_recon = tomopy.recon(sino, theta, center=2048, algorithm='gridrec')
-        dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
-    ref_recon = np.squeeze(ref_recon)
+        prj_local.process_all_local(mask_ratio=0.85, offset_intensity=True, ref_fname='data/ref_recon.tiff')
 
     influx = []
     snr_tomosaic = []

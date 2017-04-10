@@ -112,11 +112,15 @@ class Simulator(object):
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
 
-    def recon_all_local(self, save_path=None, mask_ratio=1):
+    def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, **kwargs):
 
         for sino in self.sinos_local:
             print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
             sino.reconstruct(mask_ratio=mask_ratio)
+            if offset_intensity:
+                fname = kwargs['ref_fname']
+                ref = np.squeeze(dxchange.read_tiff(fname))
+                sino.correct_abs_intensity(ref)
             if save_path is not None:
                 dxchange.write_tiff(sino.recon, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
                                                                                format(sino.coords[0], sino.coords[1])),

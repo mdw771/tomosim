@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import operator
 import dxchange
 import numpy as np
 import tomopy
@@ -78,5 +79,15 @@ class Sinogram(object):
         noise = np.random.poisson(lam=lam, size=self.sinogram.shape) - lam
         self.sinogram = self.sinogram + noise
 
+    def correct_abs_intensity(self, ref):
 
+        mask = tomopy.misc.corr._get_mask(self.recon.shape[0], self.recon.shape[1], 0.6)
+        local_mean = np.mean(self.recon[mask])
+        y0, x0 = self.coords
+        yy, xx = map(int, (self.recon.shape[0] / 2, self.recon.shape[1] / 2))
+        ref_spot = ref[y0-yy:y0-yy+self.recon.shape[0], x0-xx:x0-xx+self.recon.shape[1]]
+        ref_mean = np.mean(ref_spot[mask])
+        dxchange.write_tiff(self.recon, 'tmp/loc')
+        dxchange.write_tiff(ref_spot, 'tmp/ref')
+        self.recon = self.recon + (ref_mean - local_mean)
 

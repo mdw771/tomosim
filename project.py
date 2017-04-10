@@ -43,7 +43,7 @@ class Project(object):
                 print(sim.name_ds)
                 self.simulators.append(sim)
 
-    def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1):
+    def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1, offset_intensity=False, **kwargs):
 
         for sim in self.simulators:
 
@@ -54,7 +54,8 @@ class Project(object):
                 sim.read_sinos_local(sino_path)
 
             recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
-            sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio)
+            sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,
+                                ref_fname=kwargs['ref_fname'])
             sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
 
     def process_all_tomosaic(self, save_path='data', mask_ratio=1):
