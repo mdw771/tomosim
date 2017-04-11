@@ -31,7 +31,7 @@ class Simulator(object):
         self.snr_local = None
         self.snr_tomosaic = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180, **kwargs):
         """
         Read raw sinogram from file.
         :param fname: file name
@@ -48,7 +48,7 @@ class Simulator(object):
             raw_sino = np.squeeze(dxchange.read_aps_32id(fname, sino=(slice, slice+1)))
         else:
             raw_sino = dxchange.read_tiff(fname)
-        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False)
+        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False, fin_angle=fin_angle)
         self.pixel_size = pixel_size
 
     def raw_sino_add_noise(self, fraction_mean=0.01):
@@ -60,7 +60,7 @@ class Simulator(object):
         assert isinstance(instrument, Instrument)
         self.inst = instrument
 
-    def read_sinos_local(self, read_path=None):
+    def read_sinos_local(self, read_path=None, fin_angle=180):
 
         print('Reading sinograms.')
         flist = glob.glob(os.path.join(read_path, 'sino_loc*'))
@@ -69,10 +69,10 @@ class Simulator(object):
             y, x = map(int, regex.search(fname).group(1, 2))
             data = imread(fname)
             local_sino = Sinogram(data, 'local', coords=(y, x), center=int(self.inst.fov/2), normalize_bg=True,
-                                  minus_log=True)
+                                  minus_log=True, fin_angle=fin_angle)
             self.sinos_local.append(local_sino)
 
-    def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise'):
+    def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise', fin_angle=180):
         """
         Extract local tomography sinogram from full sinogram.
         :param save_path:
@@ -81,7 +81,6 @@ class Simulator(object):
                Available options: 'clockwise' or 'anticlockwise'
         :return:
         """
-
         for center_coords in self.inst.center_positions:
 
             print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
@@ -94,11 +93,12 @@ class Simulator(object):
 
             # compute trajectory of center of FOV in sinogram space
             sino, mask = trim_sinogram(self.raw_sino.sinogram[:, np.newaxis, :], self.raw_sino.center, w_2-y0, x0-w_2,
-                                       fov)
+                                       fov, fin_angle=fin_angle)
             sino = np.squeeze(sino)
             # dxchange.write_tiff(sino, 'data/temp')
 
-            local_sino = Sinogram(np.copy(sino), 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True)
+            local_sino = Sinogram(np.copy(sino), 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True,
+                                  fin_angle=fin_angle)
             self.sinos_local.append(local_sino)
 
             if save_path is not None:
@@ -145,7 +145,7 @@ class Simulator(object):
                                 dtype='float32')
         return self.full_recon_local
 
-    def sample_full_sinogram_tomosaic(self):
+    def sample_full_sinogram_tomosaic(self, fin_angle=180):
 
         for center_pos in self.inst.stage_positions:
 
@@ -158,7 +158,7 @@ class Simulator(object):
 
             partial_sino = self.raw_sino.sinogram[:, endl:endr]
             partial_sino = Sinogram(partial_sino, 'tomosaic', coords=center_pos, center=self.raw_sino.center,
-                                    normalize_bg=False, minus_log=True)
+                                    normalize_bg=False, minus_log=True, fin_angle=fin_angle)
             self.sinos_tomosaic.append(partial_sino)
 
     def stitch_all_sinos_tomosaic(self, center=None):
@@ -171,7 +171,7 @@ class Simulator(object):
             print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i+1, len(self.sinos_tomosaic)))
             ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
             full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
-        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center)
+        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center, fin_angle=sino.fin_angle)
 
     def recon_full_tomosaic(self, save_path=None, fname='recon_tomosaic', mask_ratio=1):
 

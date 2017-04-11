@@ -22,11 +22,11 @@ class Project(object):
         self.dose_local = None
         self.dose_tomosaic = None
 
-    def add_simuators(self, fname, instrument, type='tiff', center=None, pixel_size=1, downsample=None,
+    def add_simuators(self, fname, instrument, type='tiff', center=None, pixel_size=1, downsample=None, fin_angle=180,
                       **kwargs):
 
         sim = Simulator()
-        sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, **kwargs)
+        sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, fin_angle=fin_angle, **kwargs)
         sim.load_instrument(instrument)
         sim.ds = 1
         sim.name_ds = '{:d}'.format(sim.ds) if isinstance(sim.ds, int) else '{:.2f}'.format(sim.ds)
@@ -43,26 +43,27 @@ class Project(object):
                 print(sim.name_ds)
                 self.simulators.append(sim)
 
-    def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1, offset_intensity=False, **kwargs):
+    def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1, offset_intensity=False, fin_angle=180,
+                          **kwargs):
 
         for sim in self.simulators:
 
             sino_path = os.path.join(save_path, 'sino_loc_{:s}x'.format(sim.name_ds))
             if len(glob.glob(os.path.join(sino_path, 'sino_loc*'))) == 0:
-                sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask)
+                sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask, fin_angle=fin_angle)
             else:
-                sim.read_sinos_local(sino_path)
+                sim.read_sinos_local(sino_path, fin_angle=fin_angle)
 
             recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
             sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,
                                 ref_fname=kwargs['ref_fname'])
             sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
 
-    def process_all_tomosaic(self, save_path='data', mask_ratio=1):
+    def process_all_tomosaic(self, save_path='data', mask_ratio=1, fin_angle=180):
 
         for sim in self.simulators:
 
-            sim.sample_full_sinogram_tomosaic()
+            sim.sample_full_sinogram_tomosaic(fin_angle=fin_angle)
             sim.stitch_all_sinos_tomosaic()
             sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:s}x'.format(sim.name_ds),
                                     mask_ratio=mask_ratio)

@@ -9,7 +9,7 @@ from util import *
 
 class Sinogram(object):
 
-    def __init__(self, sinogram, type, coords=None, normalize_bg=False, minus_log=False, center=None):
+    def __init__(self, sinogram, type, coords=None, normalize_bg=False, minus_log=False, center=None, fin_angle=180):
 
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
@@ -45,6 +45,7 @@ class Sinogram(object):
                 self.center = center
         self.recon = None
         self.recon_mask = None
+        self.fin_angle = fin_angle
 
     def reconstruct(self, center=None, mask_ratio=1):
 
@@ -54,7 +55,7 @@ class Sinogram(object):
             ind = int((self.sinogram.shape[1] - self.shape[1]) / 2)
             center += ind
         nang = self.sinogram.shape[0]
-        theta = tomopy.angles(nang)
+        theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
 
         ###
         dxchange.write_tiff(self.sinogram, 'data/test/test', dtype='float32')

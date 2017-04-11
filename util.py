@@ -21,7 +21,7 @@ def arrange_image(img1, img2, shift):
     return newimg
 
 
-def trim_sinogram(data, center, x, y, diameter):
+def trim_sinogram(data, center, x, y, diameter, fin_angle=180):
     """
     Adopted from Tomopy.
     Provide sinogram corresponding to a circular region of interest
@@ -58,7 +58,7 @@ def trim_sinogram(data, center, x, y, diameter):
 
     roidata = np.ones((dx, dy, diameter), dtype='float32')
 
-    delphi = np.pi / dx
+    delphi = np.pi * (fin_angle / 180) / dx
     for m in range(dx):
 
         # Calculate start end coordinates for each row of the sinogram.

@@ -25,7 +25,7 @@ if __name__ == '__main__':
         sino = dxchange.read_tiff('data/shepp_sino_trans.tiff')
         sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
-        theta = tomopy.angles(sino.shape[0])
+        theta = tomopy.angles(sino.shape[0], ang2=360)
         ref_recon = tomopy.recon(sino, theta, center=2048, algorithm='gridrec')
         dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
     ref_recon = np.squeeze(ref_recon)
@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     prj_tomosaic = Project()
     prj_tomosaic.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
-                               downsample=(2, 4, 8, 16, 32))
+                               downsample=(2, 4, 8, 16, 32), fin_angle=360)
     ds_local = []
     n_proj_full = prj_tomosaic.simulators[0].raw_sino.shape[0]
     for sim in prj_tomosaic.simulators:
@@ -54,11 +54,11 @@ if __name__ == '__main__':
 
     prj_local = Project()
     prj_local.add_simuators(os.path.join('data', 'shepp_sino_trans.tiff'), inst, center=2048, pixel_size=3.2,
-                               downsample=ds_local)
+                               downsample=ds_local, fin_angle=360)
 
     if True:
-        prj_tomosaic.process_all_tomosaic()
-        prj_local.process_all_local(mask_ratio=0.85, offset_intensity=True, ref_fname='data/ref_recon.tiff')
+        prj_tomosaic.process_all_tomosaic(fin_angle=360)
+        prj_local.process_all_local(mask_ratio=0.85, offset_intensity=True, ref_fname='data/ref_recon.tiff', fin_angle=360)
 
     influx = []
     snr_tomosaic = []
