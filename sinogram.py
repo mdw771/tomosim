@@ -56,11 +56,6 @@ class Sinogram(object):
             center += ind
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
-
-        ###
-        dxchange.write_tiff(self.sinogram, 'data/test/test', dtype='float32')
-        ###
-
         data = self.sinogram[:, np.newaxis, :]
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
