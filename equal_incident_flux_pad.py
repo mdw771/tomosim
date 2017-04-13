@@ -67,10 +67,10 @@ if __name__ == '__main__':
     for sim in prj_tomosaic.simulators[1:]:
         influx.append(sim.estimate_dose_rough(25.7, sample, np.sqrt(1.779e13), 30, mode='tomosaic')[0])
         img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
-        snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.8))
+        snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.4))
     for sim in prj_local.simulators[2:]:
         img = dxchange.read_tiff(os.path.join('data', 'recon_local_{:s}x.tiff'.format(sim.name_ds)))
-        snr_local.append(snr(img, ref_recon, mask_ratio=0.8))
+        snr_local.append(snr(img, ref_recon, mask_ratio=0.4))
     plt.figure()
     plt.semilogx(influx, snr_local, label='Local', marker='o')
     plt.semilogx(influx, snr_tomosaic, label='Tomosaic', marker='o')
