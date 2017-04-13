@@ -161,15 +161,25 @@ class Simulator(object):
 
     def stitch_all_sinos_tomosaic(self, center=None):
 
+        # if center is None:
+        #     center = self.raw_sino.center
+        # full_sino = np.zeros([1, 1])
+        # dx2 = int(self.inst.fov / 2)
+        # for (i, sino) in enumerate(self.sinos_tomosaic):
+        #     print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i+1, len(self.sinos_tomosaic)))
+        #     ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
+        #     full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
+        # self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center, fin_angle=sino.fin_angle)
         if center is None:
             center = self.raw_sino.center
-        full_sino = np.zeros([1, 1])
+        full_sino = np.zeros(self.raw_sino.shape)
         dx2 = int(self.inst.fov / 2)
         for (i, sino) in enumerate(self.sinos_tomosaic):
-            print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i+1, len(self.sinos_tomosaic)))
-            ledge = sino.coords - dx2 if sino.coords - dx2 >= 0 else 0
-            full_sino = arrange_image(full_sino, sino.sinogram, [0, ledge])
-        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center, fin_angle=sino.fin_angle)
+            print('Stitching tomosaic sinograms ({:d} of {:d} finished).'.format(i + 1, len(self.sinos_tomosaic)))
+            full_sino[:, sino.coords-dx2:sino.coords-dx2+self.inst.fov] = sino.sinogram
+        self.stitched_sino_tomosaic = Sinogram(full_sino, 'full', coords=center, center=center,
+                                               fin_angle=sino.fin_angle)
+
 
     def recon_full_tomosaic(self, save_path=None, fname='recon_tomosaic', mask_ratio=1):
 

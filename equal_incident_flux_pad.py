@@ -26,7 +26,7 @@ if __name__ == '__main__':
         sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
         theta = tomopy.angles(sino.shape[0])
-        ref_recon = tomopy.recon(sino, theta, center=2048, algorithm='gridrec')
+        ref_recon = tomopy.recon(sino, theta, center=2048+2048, algorithm='gridrec')
         dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
     ref_recon = np.squeeze(ref_recon)
 
