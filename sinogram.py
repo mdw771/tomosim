@@ -74,10 +74,17 @@ class Sinogram(object):
         Add poisson noise to the sinogram.
         :param fraction_mean: float; poisson expectation as fraction of sinogram mean value
         """
-        x_ref_norm_sq = np.linalg.norm(self.sinogram) ** 2
-        lam = x_ref_norm_sq / pow(10., snr/10.) / self.sinogram.size
-        noise = np.random.poisson(lam=lam, size=self.sinogram.shape) - lam
-        self.sinogram = self.sinogram + noise
+        flag = False
+        temp = np.copy(self.sinogram)
+        if np.isclose(temp.max(), 1):
+            temp = temp * 1000.
+            flag = True
+        x_ref_norm_sq = np.linalg.norm(temp) ** 2
+        lam = x_ref_norm_sq / pow(10., snr/10.) / temp.size
+        noise = np.random.poisson(lam=lam, size=temp.shape) - lam
+        self.sinogram = temp + noise
+        if flag:
+            self.sinogram = self.sinogram / 1000.
 
     def correct_abs_intensity(self, ref):
 
