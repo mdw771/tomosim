@@ -67,6 +67,9 @@ if __name__ == '__main__':
         prj_local.add_simuators(os.path.join('data', 'shepp_sino_pad.tiff'), inst, center=2048+2048, pixel_size=3.2,
                                    downsample=ds_local, noise_snr=raw_snr)
 
+        # output noise added raw sino
+        dxchange.write_tiff(prj_tomosaic.simulators[0].raw_sino.sinogram, os.path.join('data', dirname, 'noise_raw.tiff'))
+
         if True:
             prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', dirname))
             prj_local.process_all_local(mask_ratio=0.85, offset_intensity=True, save_path=os.path.join('data', dirname),
