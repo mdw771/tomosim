@@ -68,7 +68,8 @@ if __name__ == '__main__':
                                    downsample=ds_local, noise_snr=raw_snr)
 
         # output noise added raw sino
-        dxchange.write_tiff(prj_tomosaic.simulators[0].raw_sino.sinogram, os.path.join('data', dirname, 'noise_raw.tiff'))
+        dxchange.write_tiff(prj_tomosaic.simulators[0].raw_sino.sinogram,
+                            os.path.join('data', dirname, 'noisy_raw.tiff'), dtype='float32')
 
         if True:
             prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', dirname))
