@@ -23,6 +23,7 @@ class Sinogram(object):
             # self.normalized_bg = True
             sinogram = pad_sinogram(sinogram, int(np.ceil(sinogram.shape[1]*2)))
             # sinogram = tomopy.normalize_bg(sinogram)
+        sinogram[sinogram < 0] = 2e-3
         sinogram[np.abs(sinogram) < 2e-3] = 2e-3
         sinogram[sinogram > 1] = 1
         if minus_log:
