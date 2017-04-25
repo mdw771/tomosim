@@ -28,6 +28,7 @@ class Sinogram(object):
         sinogram[sinogram > 1] = 1
         if minus_log:
             sinogram = -np.log(sinogram)
+        sinogram[np.isnan(sinogram)] = 0
         sinogram = np.squeeze(sinogram)
         # if self.padded:
         #     sinogram = lateral_damp(sinogram, length=int(0.3*self.shape[1]))
@@ -81,6 +82,8 @@ class Sinogram(object):
             flag = True
         x_ref_norm_sq = np.linalg.norm(temp) ** 2
         lam = x_ref_norm_sq / pow(10., snr/10.) / temp.size
+        if flag:
+            lam /= 1.e6
         noise = np.random.poisson(lam=lam, size=temp.shape) - lam
         self.sinogram = temp + noise
         if flag:
