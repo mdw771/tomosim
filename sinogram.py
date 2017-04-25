@@ -78,16 +78,15 @@ class Sinogram(object):
         flag = False
         temp = np.copy(self.sinogram)
         if np.isclose(temp.max(), 1):
-            temp = temp * 100000.
+            snr += 3
+            temp = temp * 10000.
             flag = True
         x_ref_norm_sq = np.linalg.norm(temp) ** 2
         lam = x_ref_norm_sq / pow(10., snr/10.) / temp.size
-        # if flag:
-        #     lam /= 1.e6
         noise = np.random.poisson(lam=lam, size=temp.shape) - lam
         self.sinogram = temp + noise
         if flag:
-            self.sinogram = self.sinogram / 100000.
+            self.sinogram = self.sinogram / 10000.
 
     def correct_abs_intensity(self, ref):
 
