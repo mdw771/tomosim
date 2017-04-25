@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     for raw_snr in snr_ls:
 
-        dirname = 'shepp_pad_rawsnr_{:d}'.format(snr)
+        dirname = 'shepp_pad_rawsnr_{:d}'.format(raw_snr)
 
         try:
             os.mkdir(os.path.join('data', dirname))
