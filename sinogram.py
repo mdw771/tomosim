@@ -66,12 +66,13 @@ class Sinogram(object):
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 
-    def add_poisson_noise(self, fraction_mean=0.01):
+    def add_poisson_noise(self, snr=5):
         """
         Add poisson noise to the sinogram.
         :param fraction_mean: float; poisson expectation as fraction of sinogram mean value
         """
-        lam = self.sinogram.mean() * fraction_mean
+        x_ref_norm_sq = np.linalg.norm(self.sinogram) ** 2
+        lam = x_ref_norm_sq / pow(10., snr/10.) / self.sinogram.size
         noise = np.random.poisson(lam=lam, size=self.sinogram.shape) - lam
         self.sinogram = self.sinogram + noise
 

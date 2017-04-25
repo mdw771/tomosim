@@ -23,10 +23,11 @@ class Project(object):
         self.dose_tomosaic = None
 
     def add_simuators(self, fname, instrument, type='tiff', center=None, pixel_size=1, downsample=None, fin_angle=180,
-                      **kwargs):
+                      noise_snr=None, **kwargs):
 
         sim = Simulator()
-        sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, fin_angle=fin_angle, **kwargs)
+        sim.read_raw_sinogram(fname, type=type, center=center, pixel_size=pixel_size, fin_angle=fin_angle,
+                              noise_snr=noise_snr, **kwargs)
         sim.load_instrument(instrument)
         sim.ds = 1
         sim.name_ds = '{:d}'.format(sim.ds) if isinstance(sim.ds, int) else '{:.2f}'.format(sim.ds)

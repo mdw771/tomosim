@@ -31,7 +31,7 @@ class Simulator(object):
         self.snr_local = None
         self.snr_tomosaic = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180, noise_snr=None, **kwargs):
         """
         Read raw sinogram from file.
         :param fname: file name
@@ -50,10 +50,8 @@ class Simulator(object):
             raw_sino = dxchange.read_tiff(fname)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False, fin_angle=fin_angle)
         self.pixel_size = pixel_size
-
-    def raw_sino_add_noise(self, fraction_mean=0.01):
-
-        self.raw_sino.add_poisson_noise(fraction_mean=fraction_mean)
+        if noise_snr is not None:
+            self.raw_sino.add_poisson_noise(noise_snr)
 
     def load_instrument(self, instrument):
 
