@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
         # create reference recon
         if os.path.exists(os.path.join('data', dirname, 'ref_recon.tiff')):
-            ref_recon = dxchange.read_tiff(os.path.join('data', raw_snr, 'ref_recon.tiff'))
+            ref_recon = dxchange.read_tiff(os.path.join('data', dirname, 'ref_recon.tiff'))
         else:
             sino = dxchange.read_tiff(os.path.join('data', 'shepp_sino_pad.tiff'))
             sino = -np.log(sino)
