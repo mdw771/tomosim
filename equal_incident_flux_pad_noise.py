@@ -112,7 +112,10 @@ for snr_in in snr_sino:
     ref = np.squeeze(dxchange.read_tiff('ref_recon.tiff'))
     img = np.squeeze(dxchange.read_tiff('recon_tomosaic_1x.tiff'))
     snr_tomosaic.append(snr(img, ref, mask_ratio=0.47))
-    img = np.squeeze(dxchange.read_tiff('recon_local_{:.2f}x.tiff'.format(ds_local_eq1)))
+    try:
+        img = np.squeeze(dxchange.read_tiff('recon_local_{:.2f}x.tiff'.format(ds_local_eq1)))
+    except:
+        img = np.squeeze(dxchange.read_tiff('recon_local_13.00x.tiff'))
     snr_local.append(snr(img, ref, mask_ratio=0.47))
 plt.figure()
 plt.semilogx(snr_sino, snr_local, label='Local', marker='o')
