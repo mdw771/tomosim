@@ -90,7 +90,7 @@ if __name__ == '__main__':
         plt.figure()
         plt.semilogx(influx, snr_local, label='Local', marker='o')
         plt.semilogx(influx, snr_tomosaic, label='Tomosaic', marker='o')
-        plt.legend()
+        plt.legend(loc='lower right')
         plt.xlabel('Total influx')
         plt.ylabel('SNR')
         plt.savefig(os.path.join('data', dirname, 'snr_vs_influx.pdf'), format='pdf')
