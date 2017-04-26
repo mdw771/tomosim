@@ -117,6 +117,7 @@ for snr_in in snr_sino:
     except:
         img = np.squeeze(dxchange.read_tiff('recon_local_13.00x.tiff'))
     snr_local.append(snr(img, ref, mask_ratio=0.47))
+    os.chdir(root)
 plt.figure()
 plt.semilogx(snr_sino, snr_local, label='Local', marker='o')
 plt.semilogx(snr_sino, snr_tomosaic, label='Tomosaic', marker='o')
