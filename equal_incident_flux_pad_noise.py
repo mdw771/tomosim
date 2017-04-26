@@ -18,7 +18,7 @@ from sample import *
 
 if __name__ == '__main__':
 
-    snr_ls = [1, 2, 4, 8, 16, 32]
+    snr_ls = [1, 2, 4, 8, 16, 32, 64]
 
     for raw_snr in snr_ls:
 
@@ -63,6 +63,8 @@ if __name__ == '__main__':
             ds_local.append(float(n_proj_full) / float(n_proj_local))
         print ds_local
 
+        ds_local_eq1 = ds_local[0]
+
         prj_local = Project()
         prj_local.add_simuators(os.path.join('data', 'shepp_sino_pad.tiff'), inst, center=2048+2048, pixel_size=3.2,
                                    downsample=ds_local, noise_snr=raw_snr)
@@ -94,3 +96,24 @@ if __name__ == '__main__':
         plt.xlabel('Total influx')
         plt.ylabel('SNR')
         plt.savefig(os.path.join('data', dirname, 'snr_vs_influx.pdf'), format='pdf')
+
+
+snr_sino = [1, 2, 4, 8, 16, 32, 64]
+snr_tomosaic = []
+snr_local = []
+for snr_in in snr_sino:
+    dirname = 'shepp_pad_rawsnr_{:d}'.format(snr_in)
+    root = os.getcwd()
+    os.chdir(os.path.join('data', dirname))
+    ref = dxchange.read_tiff('ref_recon.tiff')
+    img = dxchange.read_tiff('recon_tomosaic_1x.tiff')
+    snr_tomosaic.append(snr(img, ref, mask_ratio=0.47))
+    img = dxchange.read_tiff('recon_local_{:.2f}x.tiff'.format(ds_local_eq1))
+    snr_local.append(snr(img, ref, mask_ratio=0.47))
+plt.figure()
+plt.semilogx(snr_sino, snr_local, label='Local', marker='o')
+plt.semilogx(snr_sino, snr_tomosaic, label='Tomosaic', marker='o')
+plt.legend(loc='lower right')
+plt.xlabel('Sinogram SNR')
+plt.ylabel('Reconstruction SNR')
+plt.savefig(os.path.join('data', 'snr_noisy_sino.pdf'), format='pdf')
