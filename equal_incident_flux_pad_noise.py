@@ -3,6 +3,8 @@
 This script works for Shepp Logan phantom.
 """
 
+import gc
+
 import numpy as np
 import glob
 import dxchange
@@ -18,7 +20,8 @@ from sample import *
 
 if __name__ == '__main__':
 
-    snr_ls = [1, 2, 4, 8, 16, 32, 64]
+    # snr_ls = [1, 2, 4, 8, 16, 32, 64]
+    snr_ls = []
 
     for raw_snr in snr_ls:
 
@@ -102,6 +105,7 @@ snr_sino = [1, 2, 4, 8, 16, 32, 64]
 snr_tomosaic = []
 snr_local = []
 for snr_in in snr_sino:
+    gc.collect()
     dirname = 'shepp_pad_rawsnr_{:d}'.format(snr_in)
     root = os.getcwd()
     os.chdir(os.path.join('data', dirname))
