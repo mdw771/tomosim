@@ -36,7 +36,7 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
         ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
     else:
-        sino = dxchange.read_tiff('data/shepp_sino_pad.tiff')
+        sino = dxchange.read_tiff(os.path.join('data', 'foam_sino_pad.tiff'))
         sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
         theta = tomopy.angles(sino.shape[0])
