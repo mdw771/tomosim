@@ -5,7 +5,6 @@ import numpy as np
 import dxchange
 import os, glob, re, warnings
 import tomopy
-from tomopy import trim_sinogram
 from scipy.ndimage import imread
 
 from instrument import *
@@ -30,6 +29,8 @@ class Simulator(object):
         self.name_ds = None
         self.snr_local = None
         self.snr_tomosaic = None
+        self.sample_counter_tomosaic = None
+        self.sample_counter_local = None
 
     def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180, noise_snr=None, **kwargs):
         """
@@ -79,6 +80,8 @@ class Simulator(object):
                Available options: 'clockwise' or 'anticlockwise'
         :return:
         """
+        self.sample_counter_local = np.zeros(self.raw_sino.shape)
+
         for center_coords in self.inst.center_positions:
 
             print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
@@ -107,6 +110,8 @@ class Simulator(object):
                     save_path = 'mask'
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
+
+            self.sample_counter_local[mask] += 1
 
     def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, **kwargs):
 
@@ -143,6 +148,8 @@ class Simulator(object):
 
     def sample_full_sinogram_tomosaic(self, fin_angle=180):
 
+        self.sample_counter_tomosaic = np.zeros(self.raw_sino.shape)
+
         for center_pos in self.inst.stage_positions:
 
             sino = np.zeros(self.raw_sino.shape)
@@ -156,6 +163,8 @@ class Simulator(object):
             partial_sino = Sinogram(partial_sino, 'tomosaic', coords=center_pos, center=self.raw_sino.center,
                                     normalize_bg=False, minus_log=True, fin_angle=fin_angle)
             self.sinos_tomosaic.append(partial_sino)
+
+            self.sample_counter_tomosaic[:, endl:endr] += 1
 
     def stitch_all_sinos_tomosaic(self, center=None):
 

@@ -135,6 +135,7 @@ def lateral_damp(img, length=50, sigma=None):
     mask = gaussian_filter(mask, sigma=sigma)
     return img * mask
 
+
 def pad_sinogram(sino, length):
 
     length = int(length)
