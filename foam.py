@@ -44,59 +44,74 @@ if __name__ == '__main__':
         dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
     ref_recon = np.squeeze(ref_recon)
 
-    for n_scan in n_scan_tomosaic_ls:
+    try:
 
-        fov = sino_width if n_scan == 1 else int(sino_width / ((1 - ovlp_rate_tomosaic) * (n_scan - 1) + 1))
-        if fov % 2 == 1:
-            fov += 1
-        half_fov = int(fov / 2)
+        mean_count_tomosaic_ls = np.load(os.path.join('data', 'mean_count_tomosaic_ls.npy'))
+        mean_count_local_ls = np.load(os.path.join('data', 'mean_count_local_ls.npy'))
+        trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'trunc_ratio_tomosaic_ls.npy'))
+        trunc_ratio_local_ls = np.load(os.path.join('data', 'trunc_ratio_local_ls.npy'))
 
-        trunc = float(fov) / sino_width
-        trunc_ratio_tomosaic_ls.append(trunc)
+    except:
 
-        stage_list = np.linspace(half_fov+pad_length, sino_width+pad_length-half_fov, n_scan)
-        stage_list = stage_list.astype('int')
+        for n_scan in n_scan_tomosaic_ls:
 
-        inst = Instrument(fov)
-        inst.add_stage_positions(stage_list)
+            fov = sino_width if n_scan == 1 else int(sino_width / ((1 - ovlp_rate_tomosaic) * (n_scan - 1) + 1))
+            if fov % 2 == 1:
+                fov += 1
+            half_fov = int(fov / 2)
 
-        prj_tomosaic = Project()
-        prj_tomosaic.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
-                                   inst,
-                                   center=pad_length+half_sino_width,
-                                   pixel_size=1)
+            trunc = float(fov) / sino_width
+            trunc_ratio_tomosaic_ls.append(trunc)
 
-        prj_tomosaic.process_all_tomosaic()
+            stage_list = np.linspace(half_fov+pad_length, sino_width+pad_length-half_fov, n_scan)
+            stage_list = stage_list.astype('int')
 
-        mean_count = np.mean(prj_tomosaic.simulators[0].sample_countet_tomosaic)
-        mean_count_tomosaic_ls.append(mean_count)
+            inst = Instrument(fov)
+            inst.add_stage_positions(stage_list)
 
-    for n_scan in n_scan_local_ls:
+            prj_tomosaic = Project()
+            prj_tomosaic.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
+                                       inst,
+                                       center=pad_length+half_sino_width,
+                                       pixel_size=1)
 
-        fov = sino_width if n_scan == 1 else 2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local)
-        if fov % 2 == 1:
-            fov += 1
-        half_fov = int(fov / 2)
+            prj_tomosaic.process_all_tomosaic()
 
-        trunc = float(fov) / sino_width
-        trunc_ratio_tomosaic_ls.append(trunc)
+            mean_count = np.mean(prj_tomosaic.simulators[0].sample_countet_tomosaic)
+            mean_count_tomosaic_ls.append(mean_count)
 
-        stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
-        center_list = [(y, x) for y in stage_list for x in stage_list]
+        for n_scan in n_scan_local_ls:
 
-        inst = Instrument(fov)
-        inst.add_center_positions(center_list)
+            fov = sino_width if n_scan == 1 else 2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local)
+            if fov % 2 == 1:
+                fov += 1
+            half_fov = int(fov / 2)
 
-        prj_local = Project()
-        prj_local.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
-                                inst,
-                                center=pad_length + half_sino_width,
-                                pixel_size=1)
+            trunc = float(fov) / sino_width
+            trunc_ratio_tomosaic_ls.append(trunc)
 
-        prj_local.process_all_local(mask_ratio=mask_ratio_local)
+            stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
+            center_list = [(y, x) for y in stage_list for x in stage_list]
 
-        mean_count = np.mean(prj_local.simulators[0].sample_countet_local)
-        mean_count_local_ls.append(mean_count)
+            inst = Instrument(fov)
+            inst.add_center_positions(center_list)
+
+            prj_local = Project()
+            prj_local.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
+                                    inst,
+                                    center=pad_length + half_sino_width,
+                                    pixel_size=1)
+
+            prj_local.process_all_local(mask_ratio=mask_ratio_local)
+
+            mean_count = np.mean(prj_local.simulators[0].sample_countet_local)
+            mean_count_local_ls.append(mean_count)
+
+        # save
+        np.save(mean_count_tomosaic_ls, os.path.join('data', 'mean_count_tomosaic_ls'))
+        np.save(mean_count_local_ls, os.path.join('data', 'mean_count_local_ls'))
+        np.save(trunc_ratio_tomosaic_ls, os.path.join('data', 'trunc_ratio_tomosaic_ls'))
+        np.save(trunc_ratio_local_ls, os.path.join('data', 'trunc_ratio_local_ls'))
 
     # x for tomosaic; y for local
     comb_pts = np.array([(x, y) for x in trunc_ratio_tomosaic_ls for y in trunc_ratio_local_ls])
