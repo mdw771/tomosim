@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script works for Shepp Logan phantom.
+This script works for foam phantom.
 """
 
 import numpy as np
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     sino_width = 2048
     half_sino_width = 1024
 
-    n_scan_tomosaic_ls = np.arange(13, dtype='int')
-    n_scan_local_ls = np.arange(13, dtype='int')
+    n_scan_tomosaic_ls = np.arange(1, 13, dtype='int')
+    n_scan_local_ls = np.arange(1, 13, dtype='int')
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.9
 
@@ -55,6 +55,8 @@ if __name__ == '__main__':
 
         for n_scan in n_scan_tomosaic_ls:
 
+            print('NSCAN (tomosaic): {:d}'.format(n_scan))
+
             fov = sino_width if n_scan == 1 else int(sino_width / ((1 - ovlp_rate_tomosaic) * (n_scan - 1) + 1))
             if fov % 2 == 1:
                 fov += 1
@@ -77,10 +79,12 @@ if __name__ == '__main__':
 
             prj_tomosaic.process_all_tomosaic()
 
-            mean_count = np.mean(prj_tomosaic.simulators[0].sample_countet_tomosaic)
+            mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
             mean_count_tomosaic_ls.append(mean_count)
 
         for n_scan in n_scan_local_ls:
+
+            print('NSCAN (local): {:d}'.format(n_scan))
 
             fov = sino_width if n_scan == 1 else 2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local)
             if fov % 2 == 1:

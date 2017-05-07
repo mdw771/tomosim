@@ -49,6 +49,7 @@ class Simulator(object):
             raw_sino = np.squeeze(dxchange.read_aps_32id(fname, sino=(slice, slice+1)))
         else:
             raw_sino = dxchange.read_tiff(fname)
+        raw_sino = np.copy(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False, fin_angle=fin_angle)
         self.pixel_size = pixel_size
         if noise_snr is not None:
