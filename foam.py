@@ -107,7 +107,7 @@ if __name__ == '__main__':
             trunc_ratio_tomosaic_ls.append(trunc)
 
             stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
-            stage_list = stage_list.astype('float')
+            stage_list = stage_list.astype('int')
             center_list = [(y, x) for y in stage_list for x in stage_list]
 
             inst = Instrument(fov)
