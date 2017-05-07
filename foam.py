@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
             print('NSCAN (tomosaic): {:d}'.format(n_scan))
 
-            dirname = 'foam_tomosaic_nscan_{:d}'.format(n_scan)
+            dirname = 'foam_nscan_{:d}'.format(n_scan)
             try:
                 os.mkdir(dirname)
             except:
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
             print('NSCAN (local): {:d}'.format(n_scan))
 
-            dirname = 'foam_local_nscan_{:d}'.format(n_scan)
+            dirname = 'foam_nscan_{:d}'.format(n_scan)
             try:
                 os.mkdir(dirname)
             except:
@@ -107,6 +107,7 @@ if __name__ == '__main__':
             trunc_ratio_tomosaic_ls.append(trunc)
 
             stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
+            stage_list = stage_list.astype('float')
             center_list = [(y, x) for y in stage_list for x in stage_list]
 
             inst = Instrument(fov)
