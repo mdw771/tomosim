@@ -45,7 +45,7 @@ class Project(object):
                 self.simulators.append(sim)
 
     def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1, offset_intensity=False, fin_angle=180,
-                          **kwargs):
+                          allow_read=True, **kwargs):
 
         for sim in self.simulators:
 
@@ -53,7 +53,10 @@ class Project(object):
             if len(glob.glob(os.path.join(sino_path, 'sino_loc*'))) == 0:
                 sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask, fin_angle=fin_angle)
             else:
-                sim.read_sinos_local(sino_path, fin_angle=fin_angle)
+                if allow_read:
+                    sim.read_sinos_local(sino_path, fin_angle=fin_angle)
+                else:
+                    sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask, fin_angle=fin_angle)
 
             recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
             sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,

@@ -119,7 +119,8 @@ if __name__ == '__main__':
 
             prj_local.process_all_local(mask_ratio=mask_ratio_local,
                                         save_path=os.path.join('data', dirname),
-                                        ref_fname=os.path.join('data', dirname, 'ref_recon.tiff'))
+                                        ref_fname=os.path.join('data', dirname, 'ref_recon.tiff'),
+                                        allow_read=False)
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
