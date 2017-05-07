@@ -22,8 +22,8 @@ if __name__ == '__main__':
     sino_width = 2048
     half_sino_width = 1024
 
-    n_scan_tomosaic_ls = np.arange(1, 13, dtype='int')
-    n_scan_local_ls = np.arange(1, 13, dtype='int')
+    n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
+    n_scan_local_ls = np.arange(1, 14, dtype='int')
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.9
 
@@ -45,12 +45,10 @@ if __name__ == '__main__':
     ref_recon = np.squeeze(ref_recon)
 
     try:
-
         mean_count_tomosaic_ls = np.load(os.path.join('data', 'mean_count_tomosaic_ls.npy'))
         mean_count_local_ls = np.load(os.path.join('data', 'mean_count_local_ls.npy'))
         trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'trunc_ratio_tomosaic_ls.npy'))
         trunc_ratio_local_ls = np.load(os.path.join('data', 'trunc_ratio_local_ls.npy'))
-
     except:
 
         for n_scan in n_scan_tomosaic_ls:
@@ -123,7 +121,7 @@ if __name__ == '__main__':
                                         save_path=os.path.join('data', dirname),
                                         ref_fname=os.path.join('data', dirname, 'ref_recon.tiff'))
 
-            mean_count = np.mean(prj_local.simulators[0].sample_countet_local)
+            mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
 
         # save
