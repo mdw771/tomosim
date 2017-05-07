@@ -57,6 +57,12 @@ if __name__ == '__main__':
 
             print('NSCAN (tomosaic): {:d}'.format(n_scan))
 
+            dirname = 'foam_tomosaic_nscan_{:d}'.format(n_scan)
+            try:
+                os.mkdir(dirname)
+            except:
+                pass
+
             fov = sino_width if n_scan == 1 else int(sino_width / ((1 - ovlp_rate_tomosaic) * (n_scan - 1) + 1))
             if fov % 2 == 1:
                 fov += 1
@@ -77,7 +83,7 @@ if __name__ == '__main__':
                                        center=pad_length+half_sino_width,
                                        pixel_size=1)
 
-            prj_tomosaic.process_all_tomosaic()
+            prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', dirname))
 
             mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
             mean_count_tomosaic_ls.append(mean_count)
@@ -85,6 +91,12 @@ if __name__ == '__main__':
         for n_scan in n_scan_local_ls:
 
             print('NSCAN (local): {:d}'.format(n_scan))
+
+            dirname = 'foam_local_nscan_{:d}'.format(n_scan)
+            try:
+                os.mkdir(dirname)
+            except:
+                pass
 
             fov = sino_width if n_scan == 1 else 2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local)
             if fov % 2 == 1:
@@ -106,7 +118,8 @@ if __name__ == '__main__':
                                     center=pad_length + half_sino_width,
                                     pixel_size=1)
 
-            prj_local.process_all_local(mask_ratio=mask_ratio_local)
+            prj_local.process_all_local(mask_ratio=mask_ratio_local,
+                                        save_path=os.path.join('data', dirname))
 
             mean_count = np.mean(prj_local.simulators[0].sample_countet_local)
             mean_count_local_ls.append(mean_count)
