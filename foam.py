@@ -102,7 +102,7 @@ if __name__ == '__main__':
             half_fov = int(fov / 2)
 
             trunc = float(fov) / sino_width
-            trunc_ratio_tomosaic_ls.append(trunc)
+            trunc_ratio_local_ls.append(trunc)
 
             stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
             stage_list = stage_list.astype('int')
