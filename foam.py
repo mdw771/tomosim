@@ -136,10 +136,10 @@ if __name__ == '__main__':
         np.save(os.path.join('data', 'trunc_ratio_tomosaic_ls'), trunc_ratio_tomosaic_ls)
         np.save(os.path.join('data', 'trunc_ratio_local_ls'), trunc_ratio_local_ls)
 
-        print(trunc_ratio_tomosaic_ls)
-        print(trunc_ratio_local_ls)
-        print(mean_count_tomosaic_ls)
-        print(mean_count_local_ls)
+    print(trunc_ratio_tomosaic_ls)
+    print(trunc_ratio_local_ls)
+    print(mean_count_tomosaic_ls)
+    print(mean_count_local_ls)
 
     # x for tomosaic; y for local
     comb_pts = np.array([(x, y) for x in trunc_ratio_tomosaic_ls for y in trunc_ratio_local_ls])
