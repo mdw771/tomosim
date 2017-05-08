@@ -125,11 +125,16 @@ if __name__ == '__main__':
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
 
+        mean_count_tomosaic_ls = np.array(mean_count_tomosaic_ls)
+        mean_count_local_ls = np.array(mean_count_local_ls)
+        trunc_ratio_tomosaic_ls = np.array(trunc_ratio_tomosaic_ls)
+        trunc_ratio_local_ls = np.array(trunc_ratio_local_ls)
+
         # save
-        np.save(mean_count_tomosaic_ls, os.path.join('data', 'mean_count_tomosaic_ls'))
-        np.save(mean_count_local_ls, os.path.join('data', 'mean_count_local_ls'))
-        np.save(trunc_ratio_tomosaic_ls, os.path.join('data', 'trunc_ratio_tomosaic_ls'))
-        np.save(trunc_ratio_local_ls, os.path.join('data', 'trunc_ratio_local_ls'))
+        np.save(os.path.join('data', 'mean_count_tomosaic_ls'), mean_count_tomosaic_ls)
+        np.save(os.path.join('data', 'mean_count_local_ls'), mean_count_local_ls)
+        np.save(os.path.join('data', 'trunc_ratio_tomosaic_ls'), trunc_ratio_tomosaic_ls)
+        np.save(os.path.join('data', 'trunc_ratio_local_ls'), trunc_ratio_local_ls)
 
     # x for tomosaic; y for local
     comb_pts = np.array([(x, y) for x in trunc_ratio_tomosaic_ls for y in trunc_ratio_local_ls])
