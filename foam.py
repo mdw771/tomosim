@@ -147,9 +147,16 @@ if __name__ == '__main__':
     x = comb_pts[:, 0]
     y = comb_pts[:, 1]
 
-    fig = plt.figure()
-    plt.scatter(x, y, c=eff_ratio)
-    plt.savefig(os.path.join('data', 'eff_ratio.pdf'), format='pdf')
+    print(eff_ratio)
 
+    fig = plt.figure(figsize=(10, 5))
+    # colors = (eff_ratio - eff_ratio.min()) / (eff_ratio.max() - eff_ratio.min())
+    plt.scatter(x, y, c=eff_ratio, cmap='rainbow', edgecolors='none', alpha=0.8)
+    # plt.scatter(x, y, c=colors, cmap='rainbow', s=eff_ratio * 200, edgecolors='none', alpha=0.8)
+    plt.xlabel('Trunction ratio of tomosaic method')
+    plt.ylabel('Trunction ratio of local tomography method')
+    plt.colorbar()
+    plt.savefig(os.path.join('data', 'eff_ratio.pdf'), format='pdf')
+    plt.show()
 
 
