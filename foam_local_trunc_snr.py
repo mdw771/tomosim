@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
             dirname = 'foam_nscan_{:d}'.format(n_scan)
 
-            recon = np.squeeze(dxchange.read_tiff(os.path.join('data', dirname, 'recon_local_1x.tiff')))
+            recon = np.squeeze(dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_local_1x.tiff')))
             fid = snr(recon, ref_recon)
             fidelity_local_ls = np.append(fidelity_local_ls, fid)
 
