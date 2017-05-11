@@ -57,13 +57,13 @@ if __name__ == '__main__':
                 fov += 1
             half_fov = int(fov / 2)
             trunc = float(fov) / sino_width
-            trunc_ratio_local_ls.append(trunc)
+            trunc_ratio_local_ls = np.append(trunc_ratio_local_ls, trunc)
 
             dirname = 'foam_nscan_{:d}'.format(n_scan)
 
             recon = np.squeeze(dxchange.read_tiff(os.path.join('data', dirname, 'recon_local_1x.tiff')))
             fid = snr(recon, ref_recon)
-            fidelity_local_ls.append(fid)
+            fidelity_local_ls = np.append(fidelity_local_ls, fid)
 
         fidelity_local_ls = np.array(fidelity_local_ls)
         trunc_ratio_local_ls = np.array(trunc_ratio_local_ls)
