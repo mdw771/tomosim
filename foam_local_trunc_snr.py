@@ -65,7 +65,7 @@ if __name__ == '__main__':
             dirname = 'foam_nscan_{:d}'.format(n_scan)
 
             recon = np.squeeze(dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_local_1x.tiff')))
-            fid = snr(recon, ref_recon)
+            fid = snr(recon, ref_recon, mask_ratio=0.4)
             fidelity_local_ls = np.append(fidelity_local_ls, fid)
 
         fidelity_local_ls = np.array(fidelity_local_ls)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     np.save(os.path.join('data', 'fidelity_local_ls'), fidelity_local_ls)
 
     fig = plt.figure()
-    plt.plot(trunc_ratio_local_ls, fidelity_local_ls, )
+    plt.plot(trunc_ratio_local_ls, fidelity_local_ls, marker='o')
     plt.xlabel('Trunction ratio of local tomography method')
     plt.ylabel('Reconstruction fidelity (dB)')
     plt.savefig(os.path.join('data', 'local_fidelity.pdf'), format='pdf')
