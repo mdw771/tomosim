@@ -81,9 +81,9 @@ if __name__ == '__main__':
 
     # compute influx and plot
     try:
-        influx = np.load(os.path.join('data', 'influx.npy'))
-        snr_tomosaic = np.load(os.path.join('data', 'ei_fidelity_tomosaic.npy'))
-        snr_local = np.load(os.path.join('data', 'ei_fidelity_local.npy'))
+        influx = np.load(os.path.join('data', 'foam_eq_flux', 'influx.npy'))
+        snr_tomosaic = np.load(os.path.join('data', 'foam_eq_flux', 'ei_fidelity_tomosaic.npy'))
+        snr_local = np.load(os.path.join('data', 'foam_eq_flux', 'ei_fidelity_local.npy'))
     except:
         influx = []
         snr_tomosaic = []
@@ -91,14 +91,14 @@ if __name__ == '__main__':
         sample = Sample('H48.6C32.9N8.9O8.9S0.6', 1.35)
         for sim in prj_tomosaic.simulators[1:]:
             influx.append(sim.estimate_dose_rough(25.7, sample, np.sqrt(1.78e13), 30, mode='tomosaic')[0])
-            img = dxchange.read_tiff(os.path.join('data', 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
+            img = dxchange.read_tiff(os.path.join('data', 'foam_eq_flux', 'recon_tomosaic_{:s}x.tiff'.format(sim.name_ds)))
             snr_tomosaic.append(snr(img, ref_recon, mask_ratio=0.4))
         for sim in prj_local.simulators[2:]:
-            img = dxchange.read_tiff(os.path.join('data', 'recon_local_{:s}x.tiff'.format(sim.name_ds)))
+            img = dxchange.read_tiff(os.path.join('data', 'foam_eq_flux', 'recon_local_{:s}x.tiff'.format(sim.name_ds)))
             snr_local.append(snr(img, ref_recon, mask_ratio=0.4))
-        np.save(os.path.join('data', 'influx'), influx)
-        np.save(os.path.join('data', 'ei_fidelity_tomosaic'), snr_tomosaic)
-        np.save(os.path.join('data', 'ei_fidelity_local'), snr_local)
+        np.save(os.path.join('data', 'foam_eq_flux', 'influx'), influx)
+        np.save(os.path.join('data', 'foam_eq_flux', 'ei_fidelity_tomosaic'), snr_tomosaic)
+        np.save(os.path.join('data', 'foam_eq_flux', 'ei_fidelity_local'), snr_local)
 
     plt.figure()
     plt.semilogx(influx, snr_local, label='Local', marker='o')
