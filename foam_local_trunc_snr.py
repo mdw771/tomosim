@@ -48,6 +48,9 @@ if __name__ == '__main__':
 
     except:
 
+        trunc_ratio_local_ls = []
+        fidelity_local_ls = []
+
         for n_scan in n_scan_local_ls:
 
             print('NSCAN (local): {:d}'.format(n_scan))
