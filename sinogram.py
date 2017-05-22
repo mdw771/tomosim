@@ -70,7 +70,7 @@ class Sinogram(object):
         self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
 
-    def add_poisson_noise(self, snr=5):
+    def add_poisson_noise_deprecated(self, snr=5):
         """
         Add poisson noise to the sinogram.
         :param fraction_mean: float; poisson expectation as fraction of sinogram mean value
@@ -87,6 +87,13 @@ class Sinogram(object):
         self.sinogram = temp + noise
         if flag:
             self.sinogram = self.sinogram / 10000.
+
+    def add_poisson_noise(self, max_count=1000):
+
+        temp = np.copy(self.sinogram)
+        temp = temp * max_count
+        temp = np.random.poisson(temp)
+        return temp / max_count
 
     def correct_abs_intensity(self, ref):
 

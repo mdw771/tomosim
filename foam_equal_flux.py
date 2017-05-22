@@ -109,19 +109,3 @@ if __name__ == '__main__':
     plt.xlabel('Total influx')
     plt.ylabel('Reconstruction fidelity (dB)')
     plt.savefig('data/snr_vs_influx.pdf', format='pdf')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

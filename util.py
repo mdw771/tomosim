@@ -147,4 +147,3 @@ def pad_sinogram(sino, length):
     res[:, -length:] = mean_right
 
     return res
-

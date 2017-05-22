@@ -32,7 +32,8 @@ class Simulator(object):
         self.sample_counter_tomosaic = None
         self.sample_counter_local = None
 
-    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180, noise_snr=None, **kwargs):
+    def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180,
+                          max_count=None, **kwargs):
         """
         Read raw sinogram from file.
         :param fname: file name
@@ -52,8 +53,8 @@ class Simulator(object):
         raw_sino = np.copy(raw_sino)
         self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False, fin_angle=fin_angle)
         self.pixel_size = pixel_size
-        if noise_snr is not None:
-            self.raw_sino.add_poisson_noise(noise_snr)
+        if max_count is not None:
+            self.raw_sino.add_poisson_noise(max_count=max_count)
 
     def load_instrument(self, instrument):
 

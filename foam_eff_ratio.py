@@ -7,13 +7,19 @@ import numpy as np
 import glob
 import dxchange
 import matplotlib.pyplot as plt
+import scipy.interpolate
 import tomopy
+from scipy.interpolate import Rbf
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+from matplotlib import cm
 
 from project import *
 from simulator import *
 from sinogram import *
 from instrument import *
 from sample import *
+
+np.set_printoptions(threshold='infinite')
 
 
 if __name__ == '__main__':
@@ -148,16 +154,29 @@ if __name__ == '__main__':
     x = comb_pts[:, 0]
     y = comb_pts[:, 1]
 
-    print(eff_ratio)
+    # print eff_ratio.reshape([len(trunc_ratio_tomosaic_ls), len(trunc_ratio_local_ls)])
 
-    fig = plt.figure(figsize=(10, 5))
-    # colors = (eff_ratio - eff_ratio.min()) / (eff_ratio.max() - eff_ratio.min())
-    plt.scatter(x, y, c=eff_ratio, cmap='rainbow', edgecolors='none', alpha=0.8)
-    # plt.scatter(x, y, c=colors, cmap='rainbow', s=eff_ratio * 200, edgecolors='none', alpha=0.8)
-    plt.xlabel('Trunction ratio of tomosaic method')
-    plt.ylabel('Trunction ratio of local tomography method')
-    plt.colorbar()
+    t = np.linspace(0.15, 1, 100)
+    xx, yy = np.meshgrid(t, t)
+    # rbf = Rbf(x, y, eff_ratio, epsilon=2, function='linear')
+    # zz = rbf(xx, yy)
+    zz = scipy.interpolate.griddata(comb_pts, eff_ratio, (xx, yy), method='linear')
+    # zz = griddata(x, y, eff_ratio, xx, yy, interp='linear')
+    print zz
+    fig = plt.figure(figsize=(8, 7))
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
+    surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
+                       linewidth=1, antialiased=True)
+    ax.view_init(10, -135)
+    # ax2 = fig.add_subplot(1, 2, 2)
+    # ax2.pcolor(xx, yy, zz)
+    plt.xlabel('Truncation ratio of tomosaic method')
+    plt.ylabel('Truncation ratio of local tomography method')
     plt.savefig(os.path.join('data', 'eff_ratio.pdf'), format='pdf')
     plt.show()
+
+
+
+
 
 

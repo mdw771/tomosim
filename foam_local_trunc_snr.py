@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     fig = plt.figure()
     plt.plot(trunc_ratio_local_ls, fidelity_local_ls, marker='o')
-    plt.xlabel('Trunction ratio of local tomography method')
+    plt.xlabel('Truncation ratio of local tomography method')
     plt.ylabel('Reconstruction fidelity (dB)')
     plt.savefig(os.path.join('data', 'local_fidelity.pdf'), format='pdf')
     plt.show()
