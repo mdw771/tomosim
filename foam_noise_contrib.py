@@ -107,9 +107,9 @@ if __name__ == '__main__':
             snr_mean = np.mean(snr_ls)
             mean_fidelity_ls.append(snr_mean)
 
-            # save
-            np.save(os.path.join('data', 'foam_noise_contrib', 'maxcount_ls'), max_count_ls)
-            np.save(os.path.join('data', 'foam_noise_contrib', 'mean_fidelity_ls'), mean_fidelity_ls)
+        # save
+        np.save(os.path.join('data', 'foam_noise_contrib', 'maxcount_ls'), max_count_ls)
+        np.save(os.path.join('data', 'foam_noise_contrib', 'mean_fidelity_ls'), mean_fidelity_ls)
 
     print(max_count_ls)
     print(mean_fidelity_ls)
