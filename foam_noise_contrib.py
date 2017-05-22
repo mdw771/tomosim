@@ -65,7 +65,7 @@ if __name__ == '__main__':
             except:
                 pass
 
-            fov = sino_width if n_scan == 1 else 2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local)
+            fov = sino_width if n_scan == 1 else int(2 * sino_width / ((np.sqrt(2)*(n_scan-1) + 2) * mask_ratio_local))
             if fov % 2 == 1:
                 fov += 1
             half_fov = int(fov / 2)
