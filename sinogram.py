@@ -28,7 +28,7 @@ class Sinogram(object):
         sinogram[np.abs(sinogram) < 2e-3] = 2e-3
         sinogram[sinogram > 1] = 1
         if max_count is not None:
-            sinogram = self.add_poisson_noise(max_count)
+            sinogram = self.add_poisson_noise(sinogram, max_count)
         if minus_log:
             sinogram = -np.log(sinogram)
         sinogram[np.isnan(sinogram)] = 0
@@ -91,9 +91,9 @@ class Sinogram(object):
         if flag:
             self.sinogram = self.sinogram / 10000.
 
-    def add_poisson_noise(self, max_count=1000):
+    def add_poisson_noise(self, sinogram, max_count=1000):
 
-        temp = np.copy(self.sinogram)
+        temp = np.copy(sinogram)
         temp = temp * max_count
         temp = np.random.poisson(temp)
         return temp / max_count
