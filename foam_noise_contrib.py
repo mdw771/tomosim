@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
             stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
             stage_list = stage_list.astype('int')
-            center_list = [(y, x) for y in stage_list for x in stage_list]
+            center_list = [(int(y), int(x)) for y in stage_list for x in stage_list]
 
             inst = Instrument(fov)
             inst.add_center_positions(center_list)
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                                                       'foam_noise_contrib',
                                                       dirname,
                                                       'recon_loc_1x',
-                                                      'recon_loc_{:d}_{:d}'.format(y, x)))
+                                                      'recon_loc_{:d}_{:d}.tiff'.format(y, x)))
                 ref = ref_recon[y-half_fov:y-half_fov+fov, x-half_fov:x-half_fov+fov]
                 dxchange.write_tiff(img, 'data/foam_noise_contrib/tmp/tmp', dtype='float32')
                 dxchange.write_tiff(ref, 'data/foam_noise_contrib/tmp/ref', dtype='float32')
