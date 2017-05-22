@@ -9,7 +9,8 @@ from util import *
 
 class Sinogram(object):
 
-    def __init__(self, sinogram, type, coords=None, normalize_bg=False, minus_log=False, center=None, fin_angle=180):
+    def __init__(self, sinogram, type, coords=None, normalize_bg=False, minus_log=False, center=None, fin_angle=180,
+                 max_count=None):
 
         assert type in ('local', 'tomosaic', 'full', 'raw')
 
@@ -26,6 +27,8 @@ class Sinogram(object):
         sinogram[sinogram < 0] = 2e-3
         sinogram[np.abs(sinogram) < 2e-3] = 2e-3
         sinogram[sinogram > 1] = 1
+        if max_count is not None:
+            sinogram = self.add_poisson_noise(max_count)
         if minus_log:
             sinogram = -np.log(sinogram)
         sinogram[np.isnan(sinogram)] = 0

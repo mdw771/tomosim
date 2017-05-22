@@ -51,10 +51,9 @@ class Simulator(object):
         else:
             raw_sino = dxchange.read_tiff(fname)
         raw_sino = np.copy(raw_sino)
-        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False, fin_angle=fin_angle)
+        self.raw_sino = Sinogram(raw_sino, 'raw', coords=center, center=center, normalize_bg=False, minus_log=False,
+                                 fin_angle=fin_angle, max_count=max_count)
         self.pixel_size = pixel_size
-        if max_count is not None:
-            self.raw_sino.add_poisson_noise(max_count=max_count)
 
     def load_instrument(self, instrument):
 
