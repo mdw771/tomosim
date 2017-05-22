@@ -93,7 +93,7 @@ class Sinogram(object):
         temp = np.copy(self.sinogram)
         temp = temp * max_count
         temp = np.random.poisson(temp)
-        return temp / max_count
+        self.sinogram = temp / max_count
 
     def correct_abs_intensity(self, ref):
 

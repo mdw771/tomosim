@@ -114,6 +114,8 @@ if __name__ == '__main__':
     print(max_count_ls)
     print(mean_fidelity_ls)
 
+    max_count_ls = max_count_ls.astype('str')
+
     fig, ax = plt.subplots()
     extra_roi_fidelity_ls = [mean_fidelity_ls[0]] * len(mean_fidelity_ls)
 
