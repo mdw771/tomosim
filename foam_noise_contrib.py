@@ -114,12 +114,14 @@ if __name__ == '__main__':
     print(max_count_ls)
     print(mean_fidelity_ls)
 
-    max_count_ls = max_count_ls.astype('str')
+    max_count_ls = [str(max_count_ls[i]) for i in range(len(max_count_ls))]
 
     fig, ax = plt.subplots()
     extra_roi_fidelity_ls = [mean_fidelity_ls[0]] * len(mean_fidelity_ls)
 
-    ax.barh(max_count_ls, mean_fidelity_ls, max_count_ls, extra_roi_fidelity_ls)
+    ax.barh(range(len(max_count_ls)), mean_fidelity_ls)
+    ax.set_yticks(range(len(max_count_ls)))
+    ax.set_yticklabels(max_count_ls)
 
     plt.savefig(os.path.join('data', 'foam_noise_contrib.pdf'), format='pdf')
     plt.show()
