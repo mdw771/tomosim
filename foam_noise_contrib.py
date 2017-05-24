@@ -34,7 +34,7 @@ if __name__ == '__main__':
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.9
 
-    mean_fidelity_ls = []
+    mean_error_ls = []
 
     # create reference recon
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     try:
         max_count_ls = np.load(os.path.join('data', 'foam_noise_contrib', 'maxcount_ls.npy'))
-        mean_fidelity_ls = np.load(os.path.join('data', 'foam_noise_contrib', 'mean_fidelity_ls.npy'))
+        mean_error_ls = np.load(os.path.join('data', 'foam_noise_contrib', 'mean_error_ls.npy'))
     except:
 
         for max_count in max_count_ls:
@@ -105,21 +105,21 @@ if __name__ == '__main__':
                 snr_temp = snr(img, ref, mask_ratio=0.7, ss_error=True)
                 snr_ls.append(snr_temp)
             snr_mean = np.mean(snr_ls)
-            mean_fidelity_ls.append(snr_mean)
+            mean_error_ls.append(snr_mean)
 
         # save
         np.save(os.path.join('data', 'foam_noise_contrib', 'maxcount_ls'), max_count_ls)
-        np.save(os.path.join('data', 'foam_noise_contrib', 'mean_fidelity_ls'), mean_fidelity_ls)
+        np.save(os.path.join('data', 'foam_noise_contrib', 'mean_error_ls'), mean_error_ls)
 
     print(max_count_ls)
-    print(mean_fidelity_ls)
+    print(mean_error_ls)
 
     max_count_ls = [str(max_count_ls[i]) for i in range(len(max_count_ls))]
 
     fig, ax = plt.subplots()
-    extra_roi_fidelity_ls = [mean_fidelity_ls[0]] * len(mean_fidelity_ls)
+    extra_roi_fidelity_ls = [mean_error_ls[0]] * len(mean_error_ls)
 
-    ax.barh(range(len(max_count_ls)), mean_fidelity_ls)
+    ax.barh(range(len(max_count_ls)), mean_error_ls)
     ax.set_yticks(range(len(max_count_ls)))
     ax.set_yticklabels(max_count_ls)
 
