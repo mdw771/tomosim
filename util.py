@@ -87,7 +87,7 @@ def normalize(img):
     return (img - img.min()) / (img.max() - img.min())
 
 
-def snr(img, ref, mask_ratio=None):
+def snr(img, ref, mask_ratio=None, ss_error=False):
     """
     Calculate the signal-to-noise ratio.
     :param img: image array
@@ -99,15 +99,18 @@ def snr(img, ref, mask_ratio=None):
     if mask_ratio is None:
         rmean = r.mean()
         imean = i.mean()
-        r = r + imean - rmean
+        i = i + rmean - imean
     else:
         mask = tomopy.misc.corr._get_mask(img.shape[0], img.shape[1], mask_ratio)
         r = r[mask]
         i = i[mask]
         rmean = r.mean()
         imean = i.mean()
-        r = r + imean - rmean
-    return 10 * np.log10(np.linalg.norm(r) ** 2 / np.linalg.norm(r - i) ** 2)
+        i = i + rmean - imean
+    if ss_error:
+        return np.linalg.norm(r - i) ** 2
+    else:
+        return 10 * np.log10(np.linalg.norm(r) ** 2 / np.linalg.norm(r - i) ** 2)
 
 
 def downsample_img(img, ds, axis=0):
