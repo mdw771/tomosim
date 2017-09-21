@@ -26,9 +26,6 @@ if __name__ == '__main__':
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.9
 
-    trunc_ratio_local_ls = []
-    fidelity_local_ls = []
-
     # create reference recon
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
         ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
@@ -43,6 +40,7 @@ if __name__ == '__main__':
 
     try:
 
+        raise ValueError
         trunc_ratio_local_ls = np.load(os.path.join('data', 'trunc_ratio_local_ls.npy'))
         fidelity_local_ls = np.load(os.path.join('data', 'fidelity_local_ls.npy'))
 

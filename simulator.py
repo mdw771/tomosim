@@ -31,6 +31,8 @@ class Simulator(object):
         self.snr_tomosaic = None
         self.sample_counter_tomosaic = None
         self.sample_counter_local = None
+        self.sample_sum_tomosaic = None
+        self.sample_sum_local = None
 
     def read_raw_sinogram(self, fname, type='tiff', center=None, pixel_size=1, fin_angle=180,
                           max_count=None, **kwargs):
@@ -82,6 +84,7 @@ class Simulator(object):
         :return:
         """
         self.sample_counter_local = np.zeros(self.raw_sino.shape)
+        self.sample_sum_local = 0
 
         for center_coords in self.inst.center_positions:
 
@@ -113,6 +116,7 @@ class Simulator(object):
                                     overwrite=True, dtype='float32')
 
             self.sample_counter_local[mask] += 1
+            self.sample_sum_local += np.sum(-np.log(sino))
 
     def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, **kwargs):
 
@@ -150,6 +154,7 @@ class Simulator(object):
     def sample_full_sinogram_tomosaic(self, fin_angle=180):
 
         self.sample_counter_tomosaic = np.zeros(self.raw_sino.shape)
+        self.sample_sum_tomosaic = 0
 
         for center_pos in self.inst.stage_positions:
 
@@ -166,6 +171,7 @@ class Simulator(object):
             self.sinos_tomosaic.append(partial_sino)
 
             self.sample_counter_tomosaic[:, endl:endr] += 1
+            self.sample_sum_tomosaic += np.sum(partial_sino.sinogram)
 
     def stitch_all_sinos_tomosaic(self, center=None):
 

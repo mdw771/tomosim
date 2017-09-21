@@ -117,13 +117,14 @@ if __name__ == '__main__':
     max_count_ls = [str(max_count_ls[i]) for i in range(len(max_count_ls))]
 
     fig, ax = plt.subplots()
-    extra_roi_fidelity_ls = [mean_error_ls[0]] * len(mean_error_ls)
+    extra_roi_error_ls = np.zeros(len(mean_error_ls))
+    extra_roi_error_ls[:] = mean_error_ls[0]
 
-    ax.barh(range(len(max_count_ls)), mean_error_ls)
+    ax.barh(range(len(max_count_ls)), np.log10(extra_roi_error_ls), color='red')
+    ax.barh(range(len(max_count_ls)), np.log10(mean_error_ls))
     ax.set_yticks(range(len(max_count_ls)))
     ax.set_yticklabels(max_count_ls)
 
     plt.savefig(os.path.join('data', 'foam_noise_contrib.pdf'), format='pdf')
     plt.show()
-
 

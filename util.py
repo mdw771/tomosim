@@ -150,3 +150,14 @@ def pad_sinogram(sino, length):
     res[:, -length:] = mean_right
 
     return res
+
+
+def get_fov(n_scan, scanned_sino_width, mask_ratio_local):
+    """
+    Get field of view width that allows full coverage in local tomography.
+    """
+    fov = scanned_sino_width if n_scan == 1 else int(np.sqrt(2) * scanned_sino_width / (n_scan - 1 + np.sqrt(2))) + 10
+    fov = int(fov / mask_ratio_local)
+    if fov % 2 == 1:
+        fov += 1
+    return fov

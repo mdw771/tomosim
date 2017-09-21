@@ -26,11 +26,13 @@ if __name__ == '__main__':
 
     pad_length = 1024
     sino_width = 2048
+    scanned_sino_width = 2048 + 1024 # leave some space at sides to expand FOV
     half_sino_width = 1024
-    scanned_sino_width = 2048 + 1024
 
-    n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
-    n_scan_local_ls = np.arange(1, 14, dtype='int')
+    # n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
+    n_scan_tomosaic_ls = []
+    # n_scan_local_ls = np.arange(1, 14, dtype='int')
+    n_scan_local_ls = [2, 8]
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.8
 
@@ -38,8 +40,6 @@ if __name__ == '__main__':
     trunc_ratio_local_ls = []
     mean_count_tomosaic_ls = []
     mean_count_local_ls = []
-    dose_integral_tomosaic_ls = []
-    dose_integral_local_ls = []
 
     # create reference recon
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
@@ -59,8 +59,6 @@ if __name__ == '__main__':
         mean_count_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls.npy'))
         trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_tomosaic_ls.npy'))
         trunc_ratio_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_local_ls.npy'))
-        dose_integral_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'dose_integral_tomosaic_ls.npy'))
-        dose_integral_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'dose_integral_local_ls.npy'))
     except:
 
         for n_scan in n_scan_tomosaic_ls:
@@ -98,8 +96,6 @@ if __name__ == '__main__':
             mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
             mean_count_tomosaic_ls.append(mean_count)
 
-            dose_integral_tomosaic_ls.append(prj_tomosaic.simulators[0].sample_sum_tomosaic)
-
         for n_scan in n_scan_local_ls:
 
             print('NSCAN (local): {:d}'.format(n_scan))
@@ -116,7 +112,9 @@ if __name__ == '__main__':
             trunc = float(fov) / sino_width
             trunc_ratio_local_ls.append(trunc)
 
-            stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
+            stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
+            stage_end = (sino_width + pad_length * 2) - stage_begin
+            stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
             stage_list = stage_list.astype('int')
             center_list = [(y, x) for y in stage_list for x in stage_list]
 
@@ -138,23 +136,16 @@ if __name__ == '__main__':
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
 
-            dose_integral_local_ls.append(prj_local.simulators[0].sample_sum_local)
-
         mean_count_tomosaic_ls = np.array(mean_count_tomosaic_ls)
         mean_count_local_ls = np.array(mean_count_local_ls)
         trunc_ratio_tomosaic_ls = np.array(trunc_ratio_tomosaic_ls)
         trunc_ratio_local_ls = np.array(trunc_ratio_local_ls)
-        dose_integral_tomosaic_ls = np.array(dose_integral_tomosaic_ls)
-        dose_integral_local_ls = np.array(dose_integral_local_ls)
 
         # save
         np.save(os.path.join('data', 'foam_eff_ratio', 'mean_count_tomosaic_ls'), mean_count_tomosaic_ls)
         np.save(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls'), mean_count_local_ls)
         np.save(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_tomosaic_ls'), trunc_ratio_tomosaic_ls)
         np.save(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_local_ls'), trunc_ratio_local_ls)
-        np.save(os.path.join('data', 'foam_eff_ratio', 'dose_integral_tomosaic_ls'), dose_integral_tomosaic_ls)
-        np.save(os.path.join('data', 'foam_eff_ratio', 'dose_integral_local_ls'), dose_integral_local_ls)
-
 
     print(trunc_ratio_tomosaic_ls)
     print(trunc_ratio_local_ls)
@@ -183,9 +174,8 @@ if __name__ == '__main__':
     ax.view_init(10, -135)
     # ax2 = fig.add_subplot(1, 2, 2)
     # ax2.pcolor(xx, yy, zz)
-    ax.set_xlabel('Truncation ratio of tomosaic method')
-    ax.set_ylabel('Truncation ratio of local tomography method')
-    ax.set_zlabel('Dose ratio')
+    plt.xlabel('Truncation ratio of tomosaic method')
+    plt.ylabel('Truncation ratio of local tomography method')
     plt.savefig(os.path.join('data', 'eff_ratio.pdf'), format='pdf')
     plt.show()
 
