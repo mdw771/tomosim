@@ -118,7 +118,9 @@ if __name__ == '__main__':
             trunc = float(fov) / sino_width
             trunc_ratio_local_ls.append(trunc)
 
-            stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
+            stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
+            stage_end = (sino_width + pad_length * 2) - stage_begin
+            stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
             stage_list = stage_list.astype('int')
             center_list = [(y, x) for y in stage_list for x in stage_list]
 

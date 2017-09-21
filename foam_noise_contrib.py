@@ -100,8 +100,6 @@ if __name__ == '__main__':
                                                       'recon_loc_1x',
                                                       'recon_loc_{:d}_{:d}.tiff'.format(y, x)))
                 ref = ref_recon[y-half_fov:y-half_fov+fov, x-half_fov:x-half_fov+fov]
-                dxchange.write_tiff(img, 'data/foam_noise_contrib/tmp/tmp', dtype='float32')
-                dxchange.write_tiff(ref, 'data/foam_noise_contrib/tmp/ref', dtype='float32')
                 snr_temp = snr(img, ref, mask_ratio=0.7, ss_error=True)
                 snr_ls.append(snr_temp)
             snr_mean = np.mean(snr_ls)
@@ -127,4 +125,3 @@ if __name__ == '__main__':
 
     plt.savefig(os.path.join('data', 'foam_noise_contrib.pdf'), format='pdf')
     plt.show()
-
