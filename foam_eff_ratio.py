@@ -84,6 +84,8 @@ if __name__ == '__main__':
             stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
             stage_list = stage_list.astype('int')
 
+            print('Tomosaic FOV: {}; stage list: {}'.format(fov, stage_list))
+
             inst = Instrument(fov)
             inst.add_stage_positions(stage_list)
 
@@ -119,6 +121,8 @@ if __name__ == '__main__':
             stage_list = np.linspace(half_fov + pad_length, sino_width + pad_length - half_fov, n_scan)
             stage_list = stage_list.astype('int')
             center_list = [(y, x) for y in stage_list for x in stage_list]
+
+            print('Local FOV: {}; stage list: {}'.format(fov, stage_list))
 
             inst = Instrument(fov)
             inst.add_center_positions(center_list)
