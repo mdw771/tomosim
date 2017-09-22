@@ -113,7 +113,7 @@ def snr(img, ref, mask_ratio=None, ss_error=False):
         return 10 * np.log10(np.linalg.norm(r) ** 2 / np.linalg.norm(r - i) ** 2)
 
 
-def variance(img, mask_ratio=None):
+def variance(img, mask_ratio=None, normalize=True):
     """
     Calculate the signal-to-noise ratio.
     :param img: image array
@@ -121,11 +121,12 @@ def variance(img, mask_ratio=None):
     :return:
     """
     i = np.copy(img)
-    if mask_ratio is None:
-        variance = np.var(i)
-    else:
+    if mask_ratio is not None:
         mask = tomopy.misc.corr._get_mask(img.shape[0], img.shape[1], mask_ratio)
-        variance = np.var(i[mask])
+        i = i[mask]
+    variance = np.var(i)
+    if normalize:
+        variance /= np.mean(i)
     return variance
 
 
