@@ -3,6 +3,7 @@
 import numpy as np
 import tomopy
 from scipy.ndimage import zoom, gaussian_filter
+from scipy.stats import signaltonoise
 
 import gc
 import operator
@@ -113,7 +114,7 @@ def snr(img, ref, mask_ratio=None, ss_error=False):
         return 10 * np.log10(np.linalg.norm(r) ** 2 / np.linalg.norm(r - i) ** 2)
 
 
-def variance(img, mask_ratio=None, normalize=True):
+def snr_intrinsic(img, mask_ratio=None):
     """
     Calculate the signal-to-noise ratio.
     :param img: image array
@@ -124,10 +125,8 @@ def variance(img, mask_ratio=None, normalize=True):
     if mask_ratio is not None:
         mask = tomopy.misc.corr._get_mask(img.shape[0], img.shape[1], mask_ratio)
         i = i[mask]
-    variance = np.var(i)
-    if normalize:
-        variance /= np.mean(i)
-    return variance
+    snr = signaltonoise(i)
+    return snr
 
 
 def downsample_img(img, ds, axis=0):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 This script works for foam phantom.
-Plot variance and fidelity against truncation ratio.
+Plot snr_intrinsic and fidelity against truncation ratio.
 Will read already-generated data. Use foam_eff_ratio if not exists. 
 """
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
             recon = np.squeeze(
                 dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_tomosaic_1x.tiff')))
             fid = snr(recon, ref_recon, mask_ratio=0.4)
-            varc = variance(recon)
+            varc = snr_intrinsic(recon, mask_ratio=0.7)
             fidelity_tomosaic_ls.append(fid)
             variance_tomosaic_ls.append(varc)
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
             temp = []
             for y, x in center_list:
                 img = recon[y - half_fov:y - half_fov + fov, x - half_fov:x - half_fov + fov]
-                temp.append(variance(img, mask_ratio=0.4))
+                temp.append(snr_intrinsic(img, mask_ratio=0.4))
             variance_tomosaic_interior_ls.append(np.mean(temp))
 
         for n_scan in n_scan_local_ls:
@@ -107,7 +107,7 @@ if __name__ == '__main__':
 
             recon = np.squeeze(dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_local_1x.tiff')))
             fid = snr(recon, ref_recon, mask_ratio=0.4)
-            varc = variance(recon)
+            varc = snr_intrinsic(recon, mask_ratio=0.7)
             fidelity_local_ls.append(fid)
             variance_local_ls.append(varc)
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             temp = []
             for y, x in center_list:
                 img = recon[y-half_fov:y-half_fov+fov, x-half_fov:x-half_fov+fov]
-                temp.append(variance(img, mask_ratio=0.4))
+                temp.append(snr_intrinsic(img, mask_ratio=0.4))
             variance_local_interior_ls.append(np.mean(temp))
 
         fidelity_local_ls = np.array(fidelity_local_ls)
@@ -143,12 +143,12 @@ if __name__ == '__main__':
     print('TR: ', trunc_ratio_local_ls)
     print('Fidelity: ', fidelity_local_ls)
     print('Variance: ', variance_local_ls)
-    print('Interior variance: ', variance_local_interior_ls)
+    print('Interior snr_intrinsic: ', variance_local_interior_ls)
     print('Tomosaic:')
     print('TR: ', trunc_ratio_tomosaic_ls)
     print('Fidelity: ', fidelity_tomosaic_ls)
     print('Variance: ', variance_tomosaic_ls)
-    print('Interior variance: ', variance_tomosaic_interior_ls)
+    print('Interior snr_intrinsic: ', variance_tomosaic_interior_ls)
     print('===========================')
 
     matplotlib.rcParams['pdf.fonttype'] = 'truetype'
@@ -164,10 +164,10 @@ if __name__ == '__main__':
     plt.savefig(os.path.join('data', 'fidelity_trunc.pdf'), format='pdf')
 
     fig2 = plt.figure()
-    plt.plot(trunc_ratio_local_ls, variance_local_ls, marker='o', label='RMT global variance')
-    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_ls, marker='x', label='PSMT global variance')
-    plt.plot(trunc_ratio_local_ls, variance_local_interior_ls, marker='o', label='RMT interior variance')
-    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_interior_ls, marker='x', label='PSMT interior variance')
+    plt.plot(trunc_ratio_local_ls, variance_local_ls, marker='o', label='RMT global snr_intrinsic')
+    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_ls, marker='x', label='PSMT global snr_intrinsic')
+    plt.plot(trunc_ratio_local_ls, variance_local_interior_ls, marker='o', label='RMT interior snr_intrinsic')
+    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_interior_ls, marker='x', label='PSMT interior snr_intrinsic')
     plt.legend()
     plt.savefig(os.path.join('data', 'variance_trunc.pdf'), format='pdf')
     plt.show()
