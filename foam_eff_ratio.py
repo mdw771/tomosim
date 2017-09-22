@@ -12,6 +12,7 @@ import tomopy
 from scipy.interpolate import Rbf
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
+import matplotlib
 
 from project import *
 from simulator import *
@@ -170,7 +171,8 @@ if __name__ == '__main__':
 
     # x for tomosaic; y for local
     comb_pts = np.array([(x, y) for x in trunc_ratio_tomosaic_ls for y in trunc_ratio_local_ls])
-    eff_ratio = np.array([float(x) / y for x in dose_integral_tomosaic_ls for y in dose_integral_local_ls])
+    area_ratio = np.array([float(x) / y for x in mean_count_tomosaic_ls for y in mean_count_local_ls])
+    dose_ratio = np.array([float(x) / y for x in dose_integral_tomosaic_ls for y in dose_integral_local_ls])
     x = comb_pts[:, 0]
     y = comb_pts[:, 1]
 
@@ -178,22 +180,32 @@ if __name__ == '__main__':
 
     t = np.linspace(0.15, 1, 100)
     xx, yy = np.meshgrid(t, t)
-    # rbf = Rbf(x, y, eff_ratio, epsilon=2, function='linear')
-    # zz = rbf(xx, yy)
-    zz = scipy.interpolate.griddata(comb_pts, eff_ratio, (xx, yy), method='linear')
-    # zz = griddata(x, y, eff_ratio, xx, yy, interp='linear')
-    print zz
+    matplotlib.rcParams['pdf.fonttype'] = 'truetype'
+    fontProperties = {'family': 'serif', 'serif': ['Times New Roman'], 'weight': 'normal', 'size': 9}
+    plt.rc('font', **fontProperties)
+
     fig = plt.figure(figsize=(8, 7))
+    zz = scipy.interpolate.griddata(comb_pts, dose_ratio, (xx, yy), method='linear')
     ax = fig.add_subplot(1, 1, 1, projection='3d')
     surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
                        linewidth=1, antialiased=True)
     ax.view_init(10, -135)
-    # ax2 = fig.add_subplot(1, 2, 2)
-    # ax2.pcolor(xx, yy, zz)
     ax.set_xlabel('Truncation ratio of tomosaic method')
     ax.set_ylabel('Truncation ratio of local tomography method')
     ax.set_zlabel('Dose ratio')
-    plt.savefig(os.path.join('data', 'eff_ratio.pdf'), format='pdf')
+    plt.savefig(os.path.join('data', 'dose_ratio.pdf'), format='pdf')
+
+    fig = plt.figure(figsize=(8, 7))
+    zz = scipy.interpolate.griddata(comb_pts, area_ratio, (xx, yy), method='linear')
+    ax = fig.add_subplot(1, 1, 1, projection='3d')
+    surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
+                           linewidth=1, antialiased=True)
+    ax.view_init(10, -135)
+    ax.set_xlabel('Truncation ratio of tomosaic method')
+    ax.set_ylabel('Truncation ratio of local tomography method')
+    ax.set_zlabel('Area ratio')
+    plt.savefig(os.path.join('data', 'area_ratio.pdf'), format='pdf')
+
     plt.show()
 
 
