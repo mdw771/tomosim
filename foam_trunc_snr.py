@@ -10,6 +10,7 @@ import glob
 import dxchange
 import matplotlib.pyplot as plt
 import tomopy
+import matplotlib
 
 from project import *
 from simulator import *
@@ -150,9 +151,23 @@ if __name__ == '__main__':
     print('Interior variance: ', variance_tomosaic_interior_ls)
     print('===========================')
 
+    matplotlib.rcParams['pdf.fonttype'] = 'truetype'
+    fontProperties = {'family': 'serif', 'serif': ['Times New Roman'], 'weight': 'normal', 'size': 9}
+    plt.rc('font', **fontProperties)
+
     fig = plt.figure()
-    plt.plot(trunc_ratio_local_ls, fidelity_local_ls, marker='o')
-    plt.xlabel('Truncation ratio of local tomography method')
+    plt.plot(trunc_ratio_local_ls, fidelity_local_ls, marker='o', label='RMT fidelity')
+    plt.plot(trunc_ratio_tomosaic_ls, fidelity_tomosaic_ls, marker='x', label='PSMT fidelity')
+    plt.xlabel('Truncation ratio')
     plt.ylabel('Reconstruction fidelity (dB)')
-    plt.savefig(os.path.join('data', 'local_fidelity.pdf'), format='pdf')
+    plt.legend()
+    plt.savefig(os.path.join('data', 'fidelity_trunc.pdf'), format='pdf')
+
+    fig2 = plt.figure()
+    plt.plot(trunc_ratio_local_ls, variance_local_ls, marker='o', label='RMT global variance')
+    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_ls, marker='x', label='PSMT global variance')
+    plt.plot(trunc_ratio_local_ls, variance_local_interior_ls, marker='o', label='RMT interior variance')
+    plt.plot(trunc_ratio_tomosaic_ls, variance_tomosaic_interior_ls, marker='x', label='PSMT interior variance')
+    plt.legend()
+    plt.savefig(os.path.join('data', 'variance_trunc.pdf'), format='pdf')
     plt.show()

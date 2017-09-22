@@ -55,7 +55,6 @@ if __name__ == '__main__':
     ref_recon = np.squeeze(ref_recon)
 
     try:
-        raise Exception
         mean_count_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_tomosaic_ls.npy'))
         mean_count_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls.npy'))
         trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_tomosaic_ls.npy'))
