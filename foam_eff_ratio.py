@@ -76,7 +76,7 @@ if __name__ == '__main__':
             fov = get_fov(n_scan, scanned_sino_width, mask_ratio_local)
             half_fov = int(fov / 2)
 
-            trunc = float(fov) / sino_width
+            trunc = float(fov) / scanned_sino_width
             trunc_ratio_tomosaic_ls.append(trunc)
 
             stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
@@ -115,7 +115,7 @@ if __name__ == '__main__':
             fov = get_fov(n_scan, scanned_sino_width, mask_ratio_local)
             half_fov = int(fov / 2)
 
-            trunc = float(fov) / sino_width
+            trunc = float(fov) / scanned_sino_width
             trunc_ratio_local_ls.append(trunc)
 
             stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
@@ -161,15 +161,16 @@ if __name__ == '__main__':
         np.save(os.path.join('data', 'foam_eff_ratio', 'dose_integral_tomosaic_ls'), dose_integral_tomosaic_ls)
         np.save(os.path.join('data', 'foam_eff_ratio', 'dose_integral_local_ls'), dose_integral_local_ls)
 
-
     print(trunc_ratio_tomosaic_ls)
     print(trunc_ratio_local_ls)
     print(mean_count_tomosaic_ls)
     print(mean_count_local_ls)
+    print(dose_integral_tomosaic_ls)
+    print(dose_integral_local_ls)
 
     # x for tomosaic; y for local
     comb_pts = np.array([(x, y) for x in trunc_ratio_tomosaic_ls for y in trunc_ratio_local_ls])
-    eff_ratio = np.array([float(x) / y for x in mean_count_tomosaic_ls for y in mean_count_local_ls])
+    eff_ratio = np.array([float(x) / y for x in dose_integral_tomosaic_ls for y in dose_integral_local_ls])
     x = comb_pts[:, 0]
     y = comb_pts[:, 1]
 

@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # n_scan_local_ls = np.arange(1, 14, dtype='int')
     n_scan_local_ls = [2, 8]
     ovlp_rate_tomosaic = 0.2
-    mask_ratio_local = 0.8
+    mask_ratio_local = 0.7
 
     trunc_ratio_tomosaic_ls = []
     trunc_ratio_local_ls = []
@@ -131,7 +131,7 @@ if __name__ == '__main__':
                                         save_path=os.path.join('data', 'foam_eff_ratio', dirname),
                                         ref_fname=os.path.join('data', 'ref_recon.tiff'),
                                         allow_read=False,
-                                        offset_intensity=True)
+                                        offset_intensity=False)
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
