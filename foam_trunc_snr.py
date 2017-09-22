@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
             recon = np.squeeze(
                 dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_tomosaic_1x.tiff')))
-            fid = snr(recon, ref_recon, mask_ratio=0.4)
-            varc = snr_intrinsic(recon, mask_ratio=0.7)
+            fid = ssim(recon, ref_recon, mask_ratio=0.4, terms='cs')
+            varc = snr_intrinsic(recon, mask_ratio=0.4)
             fidelity_tomosaic_ls.append(fid)
             variance_tomosaic_ls.append(varc)
 
@@ -106,8 +106,8 @@ if __name__ == '__main__':
             dirname = 'foam_nscan_{:d}'.format(n_scan)
 
             recon = np.squeeze(dxchange.read_tiff(os.path.join('data', 'foam_eff_ratio', dirname, 'recon_local_1x.tiff')))
-            fid = snr(recon, ref_recon, mask_ratio=0.4)
-            varc = snr_intrinsic(recon, mask_ratio=0.7)
+            fid = ssim(recon, ref_recon, mask_ratio=0.4, terms='cs')
+            varc = snr_intrinsic(recon, mask_ratio=0.4)
             fidelity_local_ls.append(fid)
             variance_local_ls.append(varc)
 

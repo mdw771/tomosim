@@ -88,6 +88,34 @@ def normalize(img):
     return (img - img.min()) / (img.max() - img.min())
 
 
+def ssim(x, y, terms='lcs', mask_ratio=None):
+
+    ssim = 1
+    mask = tomopy.misc.corr._get_mask(x.shape[0], x.shape[1], mask_ratio)
+    x = x[mask]
+    y = y[mask]
+    for term in terms:
+        if term == 'l':
+            mu_x = np.mean(x)
+            mu_y = np.mean(y)
+            c1 = (0.01 * (np.max([x.max(), y.max()]) - np.min([x.min(), y.min()])))**2
+            ssim *= ((2 * mu_x * mu_y + c1) / (mu_x**2 + mu_y**2 + c1))
+        if term == 'c':
+            sigma_x = np.sqrt(np.var(x))
+            sigma_y = np.sqrt(np.var(y))
+            c2 = (0.03 * (np.max([x.max(), y.max()]) - np.min([x.min(), y.min()])))**2
+            ssim *= ((2 * sigma_x * sigma_y + c2) / (sigma_x**2 + sigma_y**2 + c2))**2
+        if term == 's':
+            t = np.vstack([x.flatten(), y.flatten()])
+            t = np.cov(t)
+            sigma_x = np.sqrt(t[0, 0])
+            sigma_y = np.sqrt(t[1, 1])
+            sigma_xy = t[0, 1]
+            c3 = (0.03 * (np.max([x.max(), y.max()]) - np.min([x.min(), y.min()])))**2 / 2
+            ssim *= ((sigma_xy + c3) / (sigma_x * sigma_y + c3))
+    return ssim
+
+
 def snr(img, ref, mask_ratio=None, ss_error=False):
     """
     Calculate the signal-to-noise ratio.
