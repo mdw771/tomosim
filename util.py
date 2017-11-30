@@ -3,7 +3,7 @@
 import numpy as np
 import tomopy
 from scipy.ndimage import zoom, gaussian_filter
-from scipy.stats import signaltonoise
+# from scipy.stats import signaltonoise
 
 import gc
 import operator

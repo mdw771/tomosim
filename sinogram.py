@@ -24,13 +24,12 @@ class Sinogram(object):
             # self.normalized_bg = True
             sinogram = pad_sinogram(sinogram, int(np.ceil(sinogram.shape[1]*2)))
             # sinogram = tomopy.normalize_bg(sinogram)
-        sinogram[sinogram < 0] = 2e-3
-        sinogram[np.abs(sinogram) < 2e-3] = 2e-3
-        sinogram[sinogram > 1] = 1
+        if minus_log:
+            sinogram[np.abs(sinogram) < 2e-3] = 2e-3
+            sinogram[sinogram > 1] = 1
+            sinogram = -np.log(sinogram)
         if max_count is not None:
             sinogram = self.add_poisson_noise(sinogram, max_count)
-        if minus_log:
-            sinogram = -np.log(sinogram)
         sinogram[np.isnan(sinogram)] = 0
         sinogram = np.squeeze(sinogram)
         # if self.padded:

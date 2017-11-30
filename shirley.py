@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This script works for foam phantom.
+This script works for shirley sample.
 """
 
 import numpy as np
@@ -25,14 +25,16 @@ np.set_printoptions(threshold='infinite')
 if __name__ == '__main__':
 
     pad_length = 1024
-    sino_width = 2048
-    scanned_sino_width = 2048 + 1024 # leave some space at sides to expand FOV
-    half_sino_width = 1024
+    sino_width = 8640
+    scanned_sino_width = 8640 + 1024 # leave some space at sides to expand FOV
+    half_sino_width = int(sino_width / 2)
+
+    true_center = 4271
 
     # n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
     n_scan_tomosaic_ls = []
     # n_scan_local_ls = np.arange(1, 14, dtype='int')
-    n_scan_local_ls = [2, 8]
+    n_scan_local_ls = [5]
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.7
 
@@ -45,64 +47,64 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
         ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
     else:
-        sino = dxchange.read_tiff(os.path.join('data', 'foam_sino_pad.tiff'))
+        sino = dxchange.read_tiff(os.path.join('data', 'shirley_sino_pad.tiff'))
         sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
         theta = tomopy.angles(sino.shape[0])
-        ref_recon = tomopy.recon(sino, theta, center=pad_length+half_sino_width, algorithm='gridrec')
+        ref_recon = tomopy.recon(sino, theta, center=pad_length+true_center, algorithm='gridrec')
         dxchange.write_tiff(ref_recon, 'data/ref_recon', overwrite=True)
     ref_recon = np.squeeze(ref_recon)
 
     try:
         raise Exception
-        mean_count_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_tomosaic_ls.npy'))
-        mean_count_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls.npy'))
-        trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_tomosaic_ls.npy'))
-        trunc_ratio_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_local_ls.npy'))
+        mean_count_tomosaic_ls = np.load(os.path.join('data', 'shirley_local', 'mean_count_tomosaic_ls.npy'))
+        mean_count_local_ls = np.load(os.path.join('data', 'shirley_local', 'mean_count_local_ls.npy'))
+        trunc_ratio_tomosaic_ls = np.load(os.path.join('data', 'shirley_local', 'trunc_ratio_tomosaic_ls.npy'))
+        trunc_ratio_local_ls = np.load(os.path.join('data', 'shirley_local', 'trunc_ratio_local_ls.npy'))
     except:
 
-        for n_scan in n_scan_tomosaic_ls:
-
-            print('NSCAN (tomosaic): {:d}'.format(n_scan))
-
-            dirname = 'foam_nscan_{:d}'.format(n_scan)
-            try:
-                os.mkdir(dirname)
-            except:
-                pass
-
-            fov = get_fov(n_scan, scanned_sino_width, mask_ratio_local)
-            half_fov = int(fov / 2)
-
-            trunc = float(fov) / sino_width
-            trunc_ratio_tomosaic_ls.append(trunc)
-
-            stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
-            stage_end = (sino_width + pad_length * 2) - stage_begin
-            stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
-            stage_list = stage_list.astype('int')
-
-            inst = Instrument(fov)
-            inst.add_stage_positions(stage_list)
-
-            prj_tomosaic = Project()
-            prj_tomosaic.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
-                                       inst,
-                                       center=pad_length+half_sino_width,
-                                       pixel_size=1)
-
-            prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', 'foam_eff_ratio', dirname))
-
-            mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
-            mean_count_tomosaic_ls.append(mean_count)
+        # for n_scan in n_scan_tomosaic_ls:
+        # 
+        #     print('NSCAN (tomosaic): {:d}'.format(n_scan))
+        # 
+        #     dirname = 'shirley_nscan_{:d}'.format(n_scan)
+        #     try:
+        #         os.mkdir(dirname)
+        #     except:
+        #         pass
+        # 
+        #     fov = get_fov(n_scan, scanned_sino_width, mask_ratio_local)
+        #     half_fov = int(fov / 2)
+        # 
+        #     trunc = float(fov) / sino_width
+        #     trunc_ratio_tomosaic_ls.append(trunc)
+        # 
+        #     stage_begin = ((sino_width + pad_length * 2) - scanned_sino_width) / 2
+        #     stage_end = (sino_width + pad_length * 2) - stage_begin
+        #     stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
+        #     stage_list = stage_list.astype('int')
+        # 
+        #     inst = Instrument(fov)
+        #     inst.add_stage_positions(stage_list)
+        # 
+        #     prj_tomosaic = Project()
+        #     prj_tomosaic.add_simuators(os.path.join('data', 'shirley_sino_pad.tiff'),
+        #                                inst,
+        #                                center=pad_length+half_sino_width,
+        #                                pixel_size=1)
+        # 
+        #     prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', 'shirley_local', dirname))
+        # 
+        #     mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
+        #     mean_count_tomosaic_ls.append(mean_count)
 
         for n_scan in n_scan_local_ls:
 
             print('NSCAN (local): {:d}'.format(n_scan))
 
-            dirname = 'foam_nscan_{:d}'.format(n_scan)
+            dirname = 'shirley_nscan_{:d}'.format(n_scan)
             try:
-                os.mkdir(os.path.join('data', 'foam_eff_ratio', dirname))
+                os.mkdir(os.path.join('data', 'shirley_local', dirname))
             except:
                 pass
 
@@ -122,13 +124,13 @@ if __name__ == '__main__':
             inst.add_center_positions(center_list)
 
             prj_local = Project()
-            prj_local.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
+            prj_local.add_simuators(os.path.join('data', 'shirley_sino_pad.tiff'),
                                     inst,
                                     center=pad_length + half_sino_width,
                                     pixel_size=1)
 
             prj_local.process_all_local(mask_ratio=mask_ratio_local,
-                                        save_path=os.path.join('data', 'foam_eff_ratio', dirname),
+                                        save_path=os.path.join('data', 'shirley_local', dirname),
                                         ref_fname=os.path.join('data', 'ref_recon.tiff'),
                                         allow_read=False,
                                         offset_intensity=False)
@@ -142,10 +144,10 @@ if __name__ == '__main__':
         trunc_ratio_local_ls = np.array(trunc_ratio_local_ls)
 
         # save
-        np.save(os.path.join('data', 'foam_eff_ratio', 'mean_count_tomosaic_ls'), mean_count_tomosaic_ls)
-        np.save(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls'), mean_count_local_ls)
-        np.save(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_tomosaic_ls'), trunc_ratio_tomosaic_ls)
-        np.save(os.path.join('data', 'foam_eff_ratio', 'trunc_ratio_local_ls'), trunc_ratio_local_ls)
+        np.save(os.path.join('data', 'shirley_local', 'mean_count_tomosaic_ls'), mean_count_tomosaic_ls)
+        np.save(os.path.join('data', 'shirley_local', 'mean_count_local_ls'), mean_count_local_ls)
+        np.save(os.path.join('data', 'shirley_local', 'trunc_ratio_tomosaic_ls'), trunc_ratio_tomosaic_ls)
+        np.save(os.path.join('data', 'shirley_local', 'trunc_ratio_local_ls'), trunc_ratio_local_ls)
 
     print(trunc_ratio_tomosaic_ls)
     print(trunc_ratio_local_ls)
