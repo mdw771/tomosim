@@ -126,7 +126,7 @@ if __name__ == '__main__':
             prj_local = Project()
             prj_local.add_simuators(os.path.join('data', 'shirley_sino_pad.tiff'),
                                     inst,
-                                    center=pad_length + half_sino_width,
+                                    center=pad_length + true_center,
                                     pixel_size=1)
 
             prj_local.process_all_local(mask_ratio=mask_ratio_local,
