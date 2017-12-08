@@ -74,7 +74,8 @@ class Simulator(object):
                                   minus_log=True, fin_angle=fin_angle)
             self.sinos_local.append(local_sino)
 
-    def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise', fin_angle=180):
+    def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise', fin_angle=180,
+                                   save_internally=True):
         """
         Extract local tomography sinogram from full sinogram.
         :param save_path:
@@ -102,9 +103,10 @@ class Simulator(object):
             sino = np.squeeze(sino)
             # dxchange.write_tiff(sino, 'data/temp')
 
-            local_sino = Sinogram(np.copy(sino), 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True,
-                                  fin_angle=fin_angle)
-            self.sinos_local.append(local_sino)
+            if save_internally:
+                local_sino = Sinogram(np.copy(sino), 'local', coords=(y0, x0), center=fov_2, normalize_bg=True, minus_log=True,
+                                      fin_angle=fin_angle)
+                self.sinos_local.append(local_sino)
 
             if save_path is not None:
                 dxchange.write_tiff(sino, os.path.join(save_path, 'sino_loc_{:d}_{:d}'.format(y0, x0)),
@@ -115,22 +117,44 @@ class Simulator(object):
                 dxchange.write_tiff(mask, os.path.join(save_path, 'mask', 'mask_loc_{:d}_{:d}'.format(y0, x0)),
                                     overwrite=True, dtype='float32')
 
-            self.sample_counter_local[mask] += 1
-            self.sample_sum_local += np.sum(-np.log(sino))
+            if save_internally:
+                self.sample_counter_local[mask] += 1
+                self.sample_sum_local += np.sum(-np.log(sino))
 
-    def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, **kwargs):
+    def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, read_internally=True,
+                        sino_path=None, padded_length=0, **kwargs):
 
-        for sino in self.sinos_local:
-            print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
-            sino.reconstruct(mask_ratio=mask_ratio)
-            if offset_intensity:
-                fname = kwargs['ref_fname']
-                ref = np.squeeze(dxchange.read_tiff(fname))
-                sino.correct_abs_intensity(ref)
-            if save_path is not None:
-                dxchange.write_tiff(sino.recon, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
-                                                                               format(sino.coords[0], sino.coords[1])),
-                                    overwrite=True, dtype='float32')
+        if read_internally:
+            for sino in self.sinos_local:
+                print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
+                sino.reconstruct(mask_ratio=mask_ratio)
+                if offset_intensity:
+                    fname = kwargs['ref_fname']
+                    ref = np.squeeze(dxchange.read_tiff(fname))
+                    sino.correct_abs_intensity(ref)
+                if save_path is not None:
+                    dxchange.write_tiff(sino.recon, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
+                                                                                   format(sino.coords[0], sino.coords[1])),
+                                        overwrite=True, dtype='float32')
+        else:
+            flist = glob.glob(os.path.join(sino_path, '*.tiff'))
+            for f in flist:
+                sino = dxchange.read_tiff(f)
+                coords = re.findall('\d+', f)[-2:]
+                coords = map(int, coords)
+                print('Reconstructing local tomograph at ({:d}, {:d}).'.format(coords[0], coords[1]))
+                sino = Sinogram(sino, 'local', coords=coords, center=int(self.inst.fov / 2), normalize_bg=True,
+                                minus_log=True)
+                print('Recon')
+                sino.reconstruct(mask_ratio=mask_ratio)
+                if offset_intensity:
+                    fname = kwargs['ref_fname']
+                    ref = np.squeeze(dxchange.read_tiff(fname))
+                    sino.correct_abs_intensity(ref)
+                if save_path is not None:
+                    dxchange.write_tiff(sino.recon, os.path.join(save_path, 'recon_loc_{:d}_{:d}'.
+                                                                                   format(sino.coords[0], sino.coords[1])),
+                                        overwrite=True, dtype='float32')
 
     def stitch_all_recons_local(self, save_path=None, fname='recon_local'):
 

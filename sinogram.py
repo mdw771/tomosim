@@ -22,7 +22,8 @@ class Sinogram(object):
             self.scaler = (np.mean(sinogram[:, 0]) + np.mean(sinogram[:, -1])) / 2
             self.padded = True
             # self.normalized_bg = True
-            sinogram = pad_sinogram(sinogram, int(np.ceil(sinogram.shape[1]*2)))
+            # sinogram = pad_sinogram(sinogram, int(np.ceil(sinogram.shape[1]*2)))
+            sinogram = pad_sinogram(sinogram, 1000)
             # sinogram = tomopy.normalize_bg(sinogram)
         if minus_log:
             sinogram[np.abs(sinogram) < 2e-3] = 2e-3
@@ -63,6 +64,7 @@ class Sinogram(object):
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
         data = self.sinogram[:, np.newaxis, :]
+        print(data.shape)
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         if self.padded:

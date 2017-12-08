@@ -29,7 +29,7 @@ if __name__ == '__main__':
     scanned_sino_width = 8640 + 1024 # leave some space at sides to expand FOV
     half_sino_width = int(sino_width / 2)
 
-    true_center = 4271
+    true_center = 4270
 
     # n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
     n_scan_tomosaic_ls = []
@@ -109,6 +109,7 @@ if __name__ == '__main__':
                 pass
 
             fov = get_fov(n_scan, scanned_sino_width, mask_ratio_local)
+            print(fov)
             half_fov = int(fov / 2)
 
             trunc = float(fov) / sino_width
@@ -129,11 +130,37 @@ if __name__ == '__main__':
                                     center=pad_length + true_center,
                                     pixel_size=1)
 
-            prj_local.process_all_local(mask_ratio=mask_ratio_local,
-                                        save_path=os.path.join('data', 'shirley_local', dirname),
-                                        ref_fname=os.path.join('data', 'ref_recon.tiff'),
-                                        allow_read=False,
-                                        offset_intensity=False)
+            save_path = os.path.join('data', 'shirley_local', dirname)
+            ref_fname = os.path.join('data', 'ref_recon.tiff')
+            save_mask = False
+            allow_read = False
+            offset_intensity = False
+            mask_ratio = mask_ratio_local
+
+            for sim in prj_local.simulators:
+
+                sino_path = os.path.join(save_path, 'sino_loc_{:s}x'.format(sim.name_ds))
+
+                # if len(glob.glob(os.path.join(sino_path, 'sino_loc*'))) == 0:
+                #     sim.sample_full_sinogram_local(save_path=save_path, save_mask=save_mask, fin_angle=180, save_internally=False)
+                # else:
+                #     if allow_read:
+                #         sim.read_sinos_local(sino_path, fin_angle=180)
+                #     else:
+                #         sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask,
+                #                                        fin_angle=180, save_internally=False)
+
+                recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
+                print('RECON ALL')
+                sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,
+                                    read_internally=False, sino_path=sino_path)
+                sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
+
+            # prj_local.process_all_local(mask_ratio=mask_ratio_local,
+            #                             save_path=os.path.join('data', 'shirley_local', dirname),
+            #                             ref_fname=os.path.join('data', 'ref_recon.tiff'),
+            #                             allow_read=False,
+            #                             offset_intensity=False)
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
