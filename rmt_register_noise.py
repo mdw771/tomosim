@@ -6,12 +6,14 @@ This script works for shirley sample.
 import numpy as np
 import glob
 import dxchange
+import os
 import matplotlib.pyplot as plt
 import scipy.interpolate
 import tomopy
 from scipy.interpolate import Rbf
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
+import tomosaic
 
 from project import *
 from simulator import *
@@ -19,7 +21,6 @@ from sinogram import *
 from instrument import *
 from sample import *
 
-import os
 
 np.set_printoptions(threshold='infinite')
 
@@ -81,9 +82,35 @@ offset_intensity = False
 sino_path = os.path.join(save_path, 'sino_loc')
 sim.sample_full_sinogram_local(save_path=sino_path)
 
+mean_error_ls = []
+
 for ph_mult in photon_multiplier_ls:
 
+    print('Photon multiplier = {}'.format(ph_mult))
+
+    abs_error_ls = []
     recon_path = os.path.join(save_path, 'recon_loc_phmult_{}'.format(ph_mult))
     sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio_local, offset_intensity=offset_intensity,
                         read_internally=False, sino_path=sino_path, poisson_maxcount=ph_mult)
+    # register
+    for iy, y in enumerate(stage_list_y):
+        for ix, x in enumerate(stage_list_x):
+            this_img = dxchange.read_tiff(
+                os.path.join(save_path, 'recon_loc_phmult_{}'.format(ph_mult), 'recon_loc_{}_{}'.format(y, x)))
+            if ix < len(stage_list_x) - 1:
+                right_img = dxchange.read_tiff(
+                    os.path.join(save_path, 'recon_loc_phmult_{}'.format(ph_mult), 'recon_loc_{}_{}'.format(y, stage_list_x[ix+1])))
+                this_shift = tomosaic.create_stitch_shift(this_img, right_img)
+                abs_error_ls.append(np.abs(this_shift[1] - shift_x))
+            if iy < len(stage_list_y) - 1:
+                bottom_img = dxchange.read_tiff(
+                     os.path.join(save_path, 'recon_loc_phmult_{}'.format(ph_mult), 'recon_loc_{}_{}'.format(stage_list_y[iy+1], x)))
+                this_shift = tomosaic.create_stitch_shift(this_img, bottom_img, down=1)
+                abs_error_ls.append(np.abs(this_shift[0] - shift_y))
+    mean_error_ls.append(np.mean(abs_error_ls))
+    print(np.mean(abs_error_ls))
+    print('---------------------')
 
+np.save(os.path.join(data_folder, 'mean_error_local'), mean_error_ls)
+plt.loglog(photon_multiplier_ls, mean_error_ls, '-o')
+plt.show()
