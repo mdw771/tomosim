@@ -54,7 +54,7 @@ class Sinogram(object):
         self.recon_mask = None
         self.fin_angle = fin_angle
 
-    def reconstruct(self, center=None, mask_ratio=1):
+    def reconstruct(self, center=None, mask_ratio=1, poisson_maxcount=None):
 
         if center is None:
             center = self.center
@@ -65,6 +65,10 @@ class Sinogram(object):
         theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
         data = self.sinogram[:, np.newaxis, :]
         print(data.shape)
+        if poisson_maxcount is not None:
+            data = np.exp(-data)
+            data = self.add_poisson_noise(data, max_count=poisson_maxcount)
+            data = -np.log(data)
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
         rec = np.squeeze(rec)
         if self.padded:
