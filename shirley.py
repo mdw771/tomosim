@@ -24,17 +24,17 @@ np.set_printoptions(threshold='infinite')
 
 if __name__ == '__main__':
 
-    pad_length = 1024
-    sino_width = 8640
-    scanned_sino_width = 8640 + 1024 # leave some space at sides to expand FOV
+    pad_length = 0
+    sino_width = 18710
+    scanned_sino_width = 18710 + 0 # leave some space at sides to expand FOV
     half_sino_width = int(sino_width / 2)
 
-    true_center = 4270
+    true_center = 9335
 
     # n_scan_tomosaic_ls = np.arange(1, 14, dtype='int')
     n_scan_tomosaic_ls = []
     # n_scan_local_ls = np.arange(1, 14, dtype='int')
-    n_scan_local_ls = [5]
+    n_scan_local_ls = [11]
     ovlp_rate_tomosaic = 0.2
     mask_ratio_local = 0.7
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     if os.path.exists(os.path.join('data', 'ref_recon.tiff')):
         ref_recon = dxchange.read_tiff(os.path.join('data', 'ref_recon.tiff'))
     else:
-        sino = dxchange.read_tiff(os.path.join('data', 'shirley_sino_pad.tiff'))
+        sino = dxchange.read_tiff(os.path.join('data', 'shirley_full_sino.tiff'))
         sino = -np.log(sino)
         sino = sino[:, np.newaxis, :]
         theta = tomopy.angles(sino.shape[0])
@@ -125,7 +125,7 @@ if __name__ == '__main__':
             inst.add_center_positions(center_list)
 
             prj_local = Project()
-            prj_local.add_simuators(os.path.join('data', 'shirley_sino_pad.tiff'),
+            prj_local.add_simuators(os.path.join('data', 'shirley_full_sino.tiff'),
                                     inst,
                                     center=pad_length + true_center,
                                     pixel_size=1)
@@ -142,7 +142,10 @@ if __name__ == '__main__':
                 sino_path = os.path.join(save_path, 'sino_loc_{:s}x'.format(sim.name_ds))
 
                 # if len(glob.glob(os.path.join(sino_path, 'sino_loc*'))) == 0:
-                #     sim.sample_full_sinogram_local(save_path=save_path, save_mask=save_mask, fin_angle=180, save_internally=False)
+                #     sim.sample_full_sinogram_local(save_path=sino_path,
+                #                                    save_mask=save_mask,
+                #                                    fin_angle=180,
+                #                                    save_internally=False)
                 # else:
                 #     if allow_read:
                 #         sim.read_sinos_local(sino_path, fin_angle=180)
@@ -156,11 +159,7 @@ if __name__ == '__main__':
                                     read_internally=False, sino_path=sino_path)
                 sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
 
-            # prj_local.process_all_local(mask_ratio=mask_ratio_local,
-            #                             save_path=os.path.join('data', 'shirley_local', dirname),
-            #                             ref_fname=os.path.join('data', 'ref_recon.tiff'),
-            #                             allow_read=False,
-            #                             offset_intensity=False)
+
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
