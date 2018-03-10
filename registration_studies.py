@@ -7,14 +7,15 @@ import matplotlib
 
 
 # data_folder = '/raid/home/mingdu/data/VS72_Again_180_25kev_lens10x_dfocus12cm_76_y1_x0/localtomo'
-data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
+# data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
+data_folder = '/raid/home/mingdu/data/charcoal/local_tomo'
 # data_folder = '/raid/home/mingdu/data/SAMPLE_03/panos'
 # full_proj_fname = 'proj_raw_mlog.tiff'
 full_proj_fname = '0_norm.tiff'
 # full_proj_fname = 'frame0900-2.tiff'
-tile_size = (1200, 1920)
+tile_size = (1024, 1024)
 half_tile_size = np.floor((np.array(tile_size) / 2)).astype('int')
-shift = 1750
+shift = 850
 central_slice = 10068
 full_proj = dxchange.read_tiff(os.path.join(data_folder, full_proj_fname))
 full_proj = np.squeeze(full_proj)

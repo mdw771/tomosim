@@ -145,7 +145,6 @@ class Simulator(object):
                 print('Reconstructing local tomograph at ({:d}, {:d}).'.format(coords[0], coords[1]))
                 sino = Sinogram(sino, 'local', coords=coords, center=int(self.inst.fov / 2), normalize_bg=True,
                                 minus_log=True)
-                print('Recon')
                 sino.reconstruct(mask_ratio=mask_ratio, poisson_maxcount=poisson_maxcount)
                 if offset_intensity:
                     fname = kwargs['ref_fname']

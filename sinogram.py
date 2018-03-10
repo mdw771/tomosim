@@ -18,6 +18,7 @@ class Sinogram(object):
         # self.normalized_bg = False
         self.type = type
         self.shape = sinogram.shape # unpadded shape
+        self.is_mlogged = False
         if normalize_bg:
             self.scaler = (np.mean(sinogram[:, 0]) + np.mean(sinogram[:, -1])) / 2
             self.padded = True
@@ -29,6 +30,7 @@ class Sinogram(object):
             sinogram[np.abs(sinogram) < 2e-3] = 2e-3
             sinogram[sinogram > 1] = 1
             sinogram = -np.log(sinogram)
+            self.is_mlogged = True
         if max_count is not None:
             sinogram = self.add_poisson_noise(sinogram, max_count)
         sinogram[np.isnan(sinogram)] = 0
@@ -64,19 +66,25 @@ class Sinogram(object):
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
         data = self.sinogram[:, np.newaxis, :]
-        print(data.shape)
+        # dxchange.write_tiff(np.squeeze(data), '/raid/home/mingdu/data/shirley/local_tomo/temp/raw', dtype='float32')
         if poisson_maxcount is not None:
-            data = np.exp(-data)
+            if self.is_mlogged:
+                data = np.exp(-data)
             data = self.add_poisson_noise(data, max_count=poisson_maxcount)
-            data = -np.log(data)
-        rec = tomopy.recon(data, theta, center=center, algorithm='gridrec')
-        rec = np.squeeze(rec)
+            if self.is_mlogged:
+                data = -np.log(data)
+            m_value = np.mean(data[np.isfinite(data)])
+            data[np.isinf(data)] = m_value
+            # dxchange.write_tiff(np.squeeze(data), '/raid/home/mingdu/data/shirley/local_tomo/temp/noise_sino', dtype='float32')
+        rec = tomopy.recon(data, theta, center=center, algorithm='gridrec', filter_name='parzen')
         if self.padded:
-            rec = rec[ind:ind+self.shape[1], ind:ind+self.shape[1]]
+            rec = rec[:, ind:ind+self.shape[1], ind:ind+self.shape[1]]
+        rec = tomopy.remove_ring(rec)
+        rec = np.squeeze(rec)
         # if self.normalized_bg:
             # rec = rec * self.scaler
-        self.recon = rec
         self.recon_mask = tomopy.misc.corr._get_mask(rec.shape[0], rec.shape[1], mask_ratio)
+        self.recon = rec
 
     def add_poisson_noise_deprecated(self, snr=5):
         """
@@ -97,6 +105,12 @@ class Sinogram(object):
             self.sinogram = self.sinogram / 10000.
 
     def add_poisson_noise(self, sinogram, max_count=1000):
+        """
+        Feed raw (not minus-logged) sinogram.
+        :param sinogram:
+        :param max_count:
+        :return:
+        """
 
         temp = np.copy(sinogram)
         temp = temp * max_count
