@@ -24,28 +24,30 @@ from sample import *
 
 np.set_printoptions(threshold='infinite')
 
-# data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
-data_folder = '/raid/home/mingdu/data/charcoal/local_tomo'
-raw_sino_fname = 'full_sino_no_log.tiff'
+data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
+raw_sino_fname = 'shirley_full_sino_no_log.tiff'
 
 pad_length = 0
+sino_width = 18710
+scanned_sino_width = 18710 + 0 # leave some space at sides to expand FOV
+half_sino_width = int(sino_width / 2)
 
-true_center = 3313
+true_center = 9335
 
 ovlp_rate_tomosaic = 0.2
 mask_ratio_local = 0.99
 
-shift_y = 700
-shift_x = 700
-start_y = 2238
-start_x = 1722
+shift_y = 1400
+shift_x = 1400
+start_y = 8047
+start_x = 3756
 tile_y = 2
 tile_x = 3
-fov = 1024
+fov = 1920
 half_fov = int(fov / 2)
 
-# photon_multiplier_ls = [100, 200, 500, 1000, 2000, 5000, 10000]
-photon_multiplier_ls = [10, 20, 50, 100, 200, 500, 1000]
+photon_multiplier_ls = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+# photon_multiplier_ls = [10000, 1000]
 
 # create reference recon
 if os.path.exists(os.path.join(data_folder, 'ref_recon.tiff')):

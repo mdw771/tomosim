@@ -56,7 +56,7 @@ class Sinogram(object):
         self.recon_mask = None
         self.fin_angle = fin_angle
 
-    def reconstruct(self, center=None, mask_ratio=1, poisson_maxcount=None):
+    def reconstruct(self, center=None, mask_ratio=1, poisson_maxcount=None, remove_ring=True):
 
         if center is None:
             center = self.center
@@ -66,6 +66,7 @@ class Sinogram(object):
         nang = self.sinogram.shape[0]
         theta = tomopy.angles(nang, ang1=0, ang2=self.fin_angle)
         data = self.sinogram[:, np.newaxis, :]
+        data = tomopy.remove_stripe_ti(data)
         # dxchange.write_tiff(np.squeeze(data), '/raid/home/mingdu/data/shirley/local_tomo/temp/raw', dtype='float32')
         if poisson_maxcount is not None:
             if self.is_mlogged:
@@ -79,7 +80,8 @@ class Sinogram(object):
         rec = tomopy.recon(data, theta, center=center, algorithm='gridrec', filter_name='parzen')
         if self.padded:
             rec = rec[:, ind:ind+self.shape[1], ind:ind+self.shape[1]]
-        rec = tomopy.remove_ring(rec)
+        if remove_ring:
+            rec = tomopy.remove_ring(rec)
         rec = np.squeeze(rec)
         # if self.normalized_bg:
             # rec = rec * self.scaler

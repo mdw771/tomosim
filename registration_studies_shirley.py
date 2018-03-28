@@ -7,23 +7,21 @@ import matplotlib
 
 
 # data_folder = '/raid/home/mingdu/data/VS72_Again_180_25kev_lens10x_dfocus12cm_76_y1_x0/localtomo'
-# data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
-data_folder = '/raid/home/mingdu/data/charcoal/local_tomo'
+data_folder = '/raid/home/mingdu/data/shirley/local_tomo'
+# data_folder = '/raid/home/mingdu/data/charcoal/local_tomo'
 # data_folder = '/raid/home/mingdu/data/SAMPLE_03/panos'
 # full_proj_fname = 'proj_raw_mlog.tiff'
 full_proj_fname = '0_norm.tiff'
 # full_proj_fname = 'frame0900-2.tiff'
-tile_size = (1024, 1024)
+tile_size = (1200, 1920)
 half_tile_size = np.floor((np.array(tile_size) / 2)).astype('int')
-shift = 850
-central_slice = 2000
-n_tiles = 6
-x_start = 100
+shift = 1700
+central_slice = 10068
 full_proj = dxchange.read_tiff(os.path.join(data_folder, full_proj_fname))
 full_proj = np.squeeze(full_proj)
 # pos_ls = range(0, full_proj.shape[-1] - tile_size[0] + 1, shift)
-pos_ls = range(x_start, x_start + (n_tiles - 1) * shift + 1 , shift)
-photon_multiplier_ls = [10, 20, 50, 100, 200, 500, 1000]
+pos_ls = range(0, 12816 - tile_size[0] + 1, shift)
+photon_multiplier_ls = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 
 mean_diff_ls = []
 

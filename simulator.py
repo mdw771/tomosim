@@ -122,12 +122,12 @@ class Simulator(object):
                 self.sample_sum_local += np.sum(-np.log(sino))
 
     def recon_all_local(self, save_path=None, mask_ratio=1, offset_intensity=False, read_internally=True,
-                        sino_path=None, padded_length=0, poisson_maxcount=None, **kwargs):
+                        sino_path=None, padded_length=0, poisson_maxcount=None, remove_ring=False, **kwargs):
 
         if read_internally:
             for sino in self.sinos_local:
                 print('Reconstructing local tomograph at ({:d}, {:d}).'.format(sino.coords[0], sino.coords[1]))
-                sino.reconstruct(mask_ratio=mask_ratio, poisson_maxcount=poisson_maxcount)
+                sino.reconstruct(mask_ratio=mask_ratio, poisson_maxcount=poisson_maxcount, remove_ring=remove_ring)
                 if offset_intensity:
                     fname = kwargs['ref_fname']
                     ref = np.squeeze(dxchange.read_tiff(fname))
@@ -145,7 +145,7 @@ class Simulator(object):
                 print('Reconstructing local tomograph at ({:d}, {:d}).'.format(coords[0], coords[1]))
                 sino = Sinogram(sino, 'local', coords=coords, center=int(self.inst.fov / 2), normalize_bg=True,
                                 minus_log=True)
-                sino.reconstruct(mask_ratio=mask_ratio, poisson_maxcount=poisson_maxcount)
+                sino.reconstruct(mask_ratio=mask_ratio, poisson_maxcount=poisson_maxcount, remove_ring=remove_ring)
                 if offset_intensity:
                     fname = kwargs['ref_fname']
                     ref = np.squeeze(dxchange.read_tiff(fname))
