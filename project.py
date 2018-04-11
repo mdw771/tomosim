@@ -45,7 +45,7 @@ class Project(object):
                 self.simulators.append(sim)
 
     def process_all_local(self, save_path='data', save_mask=False, mask_ratio=1, offset_intensity=False, fin_angle=180,
-                          allow_read=True, **kwargs):
+                          allow_read=True, recon=True, **kwargs):
 
         for sim in self.simulators:
 
@@ -58,19 +58,21 @@ class Project(object):
                 else:
                     sim.sample_full_sinogram_local(save_path=sino_path, save_mask=save_mask, fin_angle=fin_angle)
 
-            recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
-            sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,
-                                ref_fname=kwargs['ref_fname'])
-            sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
+            if recon:
+                recon_path = os.path.join(save_path, 'recon_loc_{:s}x'.format(sim.name_ds))
+                sim.recon_all_local(save_path=recon_path, mask_ratio=mask_ratio, offset_intensity=offset_intensity,
+                                    ref_fname=kwargs['ref_fname'])
+                sim.stitch_all_recons_local(save_path=save_path, fname='recon_local_{:s}x'.format(sim.name_ds))
 
-    def process_all_tomosaic(self, save_path='data', mask_ratio=1, fin_angle=180):
+    def process_all_tomosaic(self, save_path='data', mask_ratio=1, fin_angle=180, recon=True):
 
         for sim in self.simulators:
 
             sim.sample_full_sinogram_tomosaic(fin_angle=fin_angle)
-            sim.stitch_all_sinos_tomosaic()
-            sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:s}x'.format(sim.name_ds),
-                                    mask_ratio=mask_ratio)
+            if recon:
+                sim.stitch_all_sinos_tomosaic()
+                sim.recon_full_tomosaic(save_path=save_path, fname='recon_tomosaic_{:s}x'.format(sim.name_ds),
+                                        mask_ratio=mask_ratio)
 
     def estimate_dose(self, energy, sample, flux_rate, exposure):
 

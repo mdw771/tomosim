@@ -95,7 +95,8 @@ if __name__ == '__main__':
                                        center=pad_length+half_sino_width,
                                        pixel_size=1)
 
-            prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', 'foam_eff_ratio', dirname))
+            prj_tomosaic.process_all_tomosaic(save_path=os.path.join('data', 'foam_eff_ratio', dirname),
+                                              recon=False)
 
             mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
             mean_count_tomosaic_ls.append(mean_count)
@@ -123,11 +124,17 @@ if __name__ == '__main__':
             stage_list = np.linspace(half_fov+stage_begin, stage_end-half_fov, n_scan)
             stage_list = stage_list.astype('int')
             center_list = [(y, x) for y in stage_list for x in stage_list]
+            center_list_excl = []
+            for y, x in center_list:
+                if np.linalg.norm(np.array([y, x]) - np.array([pad_length + half_sino_width, pad_length + half_sino_width])) > half_sino_width + half_fov:
+                    print('({}, {}) skipped because it is too far.'.format(y, x))
+                else:
+                    center_list_excl.append((y, x))
 
             print('Local FOV: {}; stage list: {}'.format(fov, stage_list))
 
             inst = Instrument(fov)
-            inst.add_center_positions(center_list)
+            inst.add_center_positions(center_list_excl)
 
             prj_local = Project()
             prj_local.add_simuators(os.path.join('data', 'foam_sino_pad.tiff'),
@@ -139,7 +146,8 @@ if __name__ == '__main__':
                                         save_path=os.path.join('data', 'foam_eff_ratio', dirname),
                                         ref_fname=os.path.join('data', 'ref_recon.tiff'),
                                         allow_read=False,
-                                        offset_intensity=True)
+                                        offset_intensity=True,
+                                        recon=False)
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
@@ -177,7 +185,7 @@ if __name__ == '__main__':
 
     # print eff_ratio.reshape([len(trunc_ratio_tomosaic_ls), len(trunc_ratio_local_ls)])
 
-    t = np.linspace(0.15, 1, 100)
+    t = np.linspace(0.2, 1.25, 100)
     xx, yy = np.meshgrid(t, t)
     matplotlib.rcParams['pdf.fonttype'] = 'truetype'
     fontProperties = {'family': 'serif', 'serif': ['Times New Roman'], 'weight': 'normal', 'size': 9}
@@ -189,10 +197,10 @@ if __name__ == '__main__':
     surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
                        linewidth=1, antialiased=True)
     ax.view_init(10, -135)
-    ax.set_xlabel('Truncation ratio of tomosaic method')
-    ax.set_ylabel('Truncation ratio of local tomography method')
+    ax.set_xlabel('Truncation ratio of PS')
+    ax.set_ylabel('Truncation ratio of OS')
     ax.set_zlabel('Dose ratio')
-    plt.savefig(os.path.join('data', 'dose_ratio.pdf'), format='pdf')
+    plt.savefig(os.path.join('data', 'dose_ratio_excl_corners.pdf'), format='pdf')
 
     fig = plt.figure(figsize=(8, 7))
     zz = scipy.interpolate.griddata(comb_pts, area_ratio, (xx, yy), method='linear')
@@ -200,10 +208,10 @@ if __name__ == '__main__':
     surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
                            linewidth=1, antialiased=True)
     ax.view_init(10, -135)
-    ax.set_xlabel('Truncation ratio of tomosaic method')
-    ax.set_ylabel('Truncation ratio of local tomography method')
+    ax.set_xlabel('Truncation ratio of PS')
+    ax.set_ylabel('Truncation ratio of OS')
     ax.set_zlabel('Area ratio')
-    plt.savefig(os.path.join('data', 'area_ratio.pdf'), format='pdf')
+    plt.savefig(os.path.join('data', 'area_ratio_excl_corners.pdf'), format='pdf')
 
     plt.show()
 
