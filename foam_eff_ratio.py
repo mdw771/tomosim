@@ -30,7 +30,7 @@ if __name__ == '__main__':
     half_sino_width = int(sino_width / 2)
     # scanned_sino_width = 2048 + 1024
 
-    trunc_ratio_ls = np.arange(0.1, 1.0, 0.1)
+    trunc_ratio_ls = np.arange(0.1, 1.1, 0.1)
     gamma_ps = 0.85
     gamma_os = 0.85
     fprime_ls = (sino_width * trunc_ratio_ls).astype(int)
