@@ -53,6 +53,7 @@ if __name__ == '__main__':
     ref_recon = np.squeeze(ref_recon)
 
     try:
+        # raise Exception
         mean_count_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_tomosaic_ls.npy'))
         mean_count_local_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'mean_count_local_ls.npy'))
         dose_integral_tomosaic_ls = np.load(os.path.join('data', 'foam_eff_ratio', 'dose_integral_tomosaic_ls.npy'))
@@ -60,12 +61,11 @@ if __name__ == '__main__':
     except:
 
         # do things for PS
-        for fprime in fprime_ls:
+        for i, fprime in enumerate(fprime_ls):
 
-            dirname = 'foam_trunc_{:d}'.format(int(float(fprime / sino_width) * 100))
+            dirname = 'foam_trunc_{:d}'.format(int(100 * trunc_ratio_ls[i]))
             f = int(float(fprime) / gamma_ps)
             f2 = int(f / 2)
-            print('f\' = {}, f = {}'.format(fprime, f))
             n_scan = get_nscan_ps(f, gamma_ps, sino_width)
             if n_scan == 1:
                 stage_list = [pad_length + half_sino_width]
@@ -87,16 +87,20 @@ if __name__ == '__main__':
 
             mean_count = np.mean(prj_tomosaic.simulators[0].sample_counter_tomosaic)
             mean_count_tomosaic_ls.append(mean_count)
-
             dose_integral_tomosaic_ls.append(prj_tomosaic.simulators[0].sample_sum_tomosaic)
 
-        # do things for OS
-        for fprime in fprime_ls:
+            dxchange.write_tiff(prj_tomosaic.simulators[0].sample_counter_tomosaic, os.path.join('data', 'foam_eff_ratio', dirname, 'sampling_ps'), dtype='float32', overwrite=True)
 
-            dirname = 'foam_trunc_{:d}'.format(int(float(fprime / sino_width) * 100))
+            print('f\' = {}, f = {}, t = {}, n_f = {}, mean_count = {}, dose = {}'.format(fprime, f, trunc_ratio_ls[i], n_scan, mean_count, prj_tomosaic.simulators[0].sample_sum_tomosaic))
+
+        print('=====================================')
+
+        # do things for OS
+        for i, fprime in enumerate(fprime_ls):
+
+            dirname = 'foam_trunc_{:d}'.format(int(100 * trunc_ratio_ls[i]))
             f = int(float(fprime) / gamma_os)
             f2 = int(f / 2)
-            print('f\' = {}'.format(fprime))
             n_scan = get_nscan_os(f, fprime, sino_width)
             if n_scan == 1:
                 center_list = [(pad_length + half_sino_width, pad_length + half_sino_width)]
@@ -104,15 +108,17 @@ if __name__ == '__main__':
                 stage_begin = pad_length + fprime / np.sqrt(8)
                 stage_list = np.arange(stage_begin, stage_begin + fprime / np.sqrt(2) * (n_scan - 1) + 1, fprime / np.sqrt(2), dtype=int)
                 center_list = [(y, x) for y in stage_list for x in stage_list]
-                center_list_excl = []
+            center_list_excl = []
 
             for y, x in center_list:
                 if np.linalg.norm(np.array([y, x]) - np.array([pad_length + half_sino_width, pad_length + half_sino_width])) > half_sino_width + fprime / 2:
-                    print('({}, {}) skipped because it is too far.'.format(y, x))
+                    # print('({}, {}) skipped because it is too far.'.format(y, x))
+                    pass
                 else:
                     center_list_excl.append((y, x))
 
             inst = Instrument(f)
+            print(center_list_excl)
             inst.add_center_positions(center_list_excl)
 
             prj_local = Project()
@@ -130,9 +136,11 @@ if __name__ == '__main__':
 
             mean_count = np.mean(prj_local.simulators[0].sample_counter_local)
             mean_count_local_ls.append(mean_count)
-
             dose_integral_local_ls.append(prj_local.simulators[0].sample_sum_local)
 
+            dxchange.write_tiff(prj_local.simulators[0].sample_counter_local, os.path.join('data', 'foam_eff_ratio', dirname, 'sampling_os'), dtype='float32', overwrite=True)
+
+            print('f\' = {}, f = {}, t = {}, n_f = {}, mean_count = {}, dose = {}'.format(fprime, f, trunc_ratio_ls[i], n_scan, mean_count, prj_local.simulators[0].sample_sum_local))
 
         mean_count_tomosaic_ls = np.array(mean_count_tomosaic_ls)
         mean_count_local_ls = np.array(mean_count_local_ls)
@@ -159,7 +167,7 @@ if __name__ == '__main__':
 
     # print eff_ratio.reshape([len(trunc_ratio_tomosaic_ls), len(trunc_ratio_local_ls)])
 
-    t = trunc_ratio_ls
+    t = np.linspace(0.1, 1.0, 50)
     xx, yy = np.meshgrid(t, t)
     matplotlib.rcParams['pdf.fonttype'] = 'truetype'
     fontProperties = {'family': 'serif', 'serif': ['Times New Roman'], 'weight': 'normal', 'size': 9}
@@ -167,24 +175,27 @@ if __name__ == '__main__':
 
     fig = plt.figure(figsize=(8, 7))
     zz = scipy.interpolate.griddata(comb_pts, dose_ratio, (xx, yy), method='linear')
+    # zz = dose_ratio.reshape(xx.shape)
     ax = fig.add_subplot(1, 1, 1, projection='3d')
-    surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
+    surf = ax.plot_surface(xx, yy, zz, cmap=cm.jet,
                        linewidth=1, antialiased=True)
     ax.view_init(10, -135)
     ax.set_xlabel('Truncation ratio of PS')
     ax.set_ylabel('Truncation ratio of OS')
-    ax.set_zlabel('Dose ratio')
+    ax.set_zlabel('Dose ratio (PS/OS)')
     plt.savefig(os.path.join('data', 'dose_ratio_excl_corners.pdf'), format='pdf')
 
     fig = plt.figure(figsize=(8, 7))
     zz = scipy.interpolate.griddata(comb_pts, area_ratio, (xx, yy), method='linear')
+    # zz = area_ratio.reshape(xx.shape)
+    print(zz)
     ax = fig.add_subplot(1, 1, 1, projection='3d')
-    surf = ax.plot_surface(xx, yy, zz, rstride=5, cstride=5, cmap=cm.jet,
+    surf = ax.plot_surface(xx, yy, zz, cmap=cm.jet,
                            linewidth=1, antialiased=True)
     ax.view_init(10, -135)
     ax.set_xlabel('Truncation ratio of PS')
     ax.set_ylabel('Truncation ratio of OS')
-    ax.set_zlabel('Area ratio')
+    ax.set_zlabel('Area ratio (PS/OS)')
     plt.savefig(os.path.join('data', 'area_ratio_excl_corners.pdf'), format='pdf')
 
     plt.show()

@@ -75,7 +75,7 @@ class Simulator(object):
             self.sinos_local.append(local_sino)
 
     def sample_full_sinogram_local(self, save_path=None, save_mask=False, direction='clockwise', fin_angle=180,
-                                   save_internally=True):
+                                   save_internally=True, verbose=False):
         """
         Extract local tomography sinogram from full sinogram.
         :param save_path:
@@ -89,7 +89,8 @@ class Simulator(object):
 
         for center_coords in self.inst.center_positions:
 
-            print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
+            if verbose:
+                print('Sampling sinogram for center ({:d}, {:d}).'.format(center_coords[0], center_coords[1]))
 
             y0, x0 = center_coords
             w = self.raw_sino.shape[1]
