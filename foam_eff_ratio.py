@@ -99,8 +99,7 @@ if __name__ == '__main__':
             print('f\' = {}'.format(fprime))
             n_scan = get_nscan_os(f, fprime, sino_width)
             if n_scan == 1:
-                stage_list = [pad_length + half_sino_width]
-                center_list = [(stage_list, stage_list)]
+                center_list = [(pad_length + half_sino_width, pad_length + half_sino_width)]
             else:
                 stage_begin = pad_length + fprime / np.sqrt(8)
                 stage_list = np.arange(stage_begin, stage_begin + fprime / np.sqrt(2) * (n_scan - 1) + 1, fprime / np.sqrt(2), dtype=int)
