@@ -205,3 +205,19 @@ def get_fov(n_scan, scanned_sino_width, mask_ratio_local):
     if fov % 2 == 1:
         fov += 1
     return fov
+
+
+def get_nscan_ps(f, gammaps, l):
+
+    if f >= l:
+        return 1
+    else:
+        return int(np.ceil((l - f) / (gammaps * f) + 1))
+
+
+def get_nscan_os(f, fprime, l):
+
+    if f >= l:
+        return 1
+    else:
+        return int(np.ceil(np.sqrt(2) * l / fprime))
